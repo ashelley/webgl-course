@@ -1,9 +1,9 @@
 import { ATTR_POSITION_LOC, ATTR_NORMAL_LOC, ATTR_UV_LOC } from "./standardAttributeLocations";
-import { createVertexArray, bindVertexArray, VertexArray } from "./vertexArray";
+import { createVertexArray, bindVertexArray, WebGLVertexArrayObject } from "./vertexArray";
 
 export interface VAO {
     drawMode:number
-    vao:VertexArray
+    vao:WebGLVertexArrayObject
 
     bufVerticies: WebGLBuffer
     vertexComponentLen: number

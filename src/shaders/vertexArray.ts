@@ -1,17 +1,17 @@
-export interface VertexArray {
+export interface WebGLVertexArrayObject {
 
 }
 
 
-interface WebGLRenderingContextExt {
-    createVertexArray: () => VertexArray
-    bindVertexArray: (arg:VertexArray|null) => void
+interface WebGL2RenderingContext {
+    createVertexArray: () => WebGLVertexArrayObject
+    bindVertexArray: (arg:WebGLVertexArrayObject|null) => void
 }
 
-export const bindVertexArray = (glContext:WebGLRenderingContext,vertexArray:VertexArray|null) => {
-    return (glContext as unknown as WebGLRenderingContextExt).bindVertexArray(vertexArray)    
+export const bindVertexArray = (glContext:WebGLRenderingContext,vertexArray:WebGLVertexArrayObject|null) => {
+    return (glContext as unknown as WebGL2RenderingContext).bindVertexArray(vertexArray)    
 }
 
-export const createVertexArray = (glContext:WebGLRenderingContext):VertexArray => {
-    return (glContext as unknown as WebGLRenderingContextExt).createVertexArray()        
+export const createVertexArray = (glContext:WebGLRenderingContext):WebGLVertexArrayObject => {
+    return (glContext as unknown as WebGL2RenderingContext).createVertexArray()        
 }

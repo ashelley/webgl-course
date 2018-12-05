@@ -1,6 +1,7 @@
 import React from "react";
 import GLInstance from "./GLInstance";
 import SimpleAnimatedVertex from "./scenes/SimpleAnimatedVertex";
+import SimpleVAO from "./scenes/SimpleVAO";
 
 
 export default class WebGLCanvas extends React.Component<{},{}> {
@@ -13,10 +14,13 @@ export default class WebGLCanvas extends React.Component<{},{}> {
 
         gl.setSize(500,500).clear()
  
-        let scene = new SimpleAnimatedVertex(gl)
-        scene.init()
+        // let scene = new SimpleAnimatedVertex(gl)
+        let scene = new SimpleVAO(gl)
 
+        scene.init()
         scene.start()
+
+
  
     }
 

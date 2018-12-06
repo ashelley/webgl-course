@@ -50,7 +50,7 @@ export default class Shader {
 
     } 
 
-	render(vao:VAO) {
+	render(vao:Partial<VAO>) {
         let glContext = this.gl.glContext
 		bindVertexArray(glContext, vao.vao)
 		

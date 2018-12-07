@@ -4,6 +4,8 @@ import getStandardAttribLocations, { StandardShaderAttributeLocations } from "./
 import { VAO } from "./createMeshVAO";
 import { bindVertexArray } from "./vertexArray";
 import loadShaderProgram from "./loadShaderProgram";
+import Model from "../primatives/Model";
+import getStandardUniformLocations, { StandardShaderUniformLocations } from "./standardUniformLocations";
 
 export default class Shader {
 
@@ -11,6 +13,7 @@ export default class Shader {
     program:WebGLProgram
 
     attribLoc:StandardShaderAttributeLocations
+    uniformLoc:StandardShaderUniformLocations
 
 	constructor(gl:GLInstance,vertShaderSrc:string,fragShaderSrc:string){
         this.gl = gl
@@ -20,8 +23,8 @@ export default class Shader {
 
 		if(this.program != null){
 			glContext.useProgram(this.program);
-			this.attribLoc = getStandardAttribLocations(glContext,this.program);
-			//this.uniformLoc = {};	//TODO: Replace in later lessons with get standardUniformLocations.
+            this.attribLoc = getStandardAttribLocations(glContext,this.program);
+            this.uniformLoc = getStandardUniformLocations(glContext, this.program);
 		}
 
 		//NOTE: Extended shaders should deactivate shader when done calling super and setting up custom parts in the constructor.
@@ -44,11 +47,24 @@ export default class Shader {
             glContext.useProgram(null)
         }
 		glContext.deleteProgram(this.program);
-	}
+    }
+    
+	setPerspective(matData:Float32Array) {	
+        this.gl.glContext.uniformMatrix4fv(this.uniformLoc.perspective, false, matData); 
+        return this; 
+    }
+	setModalMatrix(matData){	this.gl.glContext.uniformMatrix4fv(this.uniformLoc.modalMatrix, false, matData); return this; }
+	setCameraMatrix(matData){	this.gl.glContext.uniformMatrix4fv(this.uniformLoc.cameraMatrix, false, matData); return this; }    
 
 	preRender() {
 
     } 
+
+    renderModel(model:Model) {
+        let glContext = this.gl.glContext
+        this.setModalMatrix(model.transform.getViewMatrix());
+        this.render(model.vao)
+    }
 
 	render(vao:Partial<VAO>) {
         let glContext = this.gl.glContext

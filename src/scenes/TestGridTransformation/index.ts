@@ -37,14 +37,18 @@ export default class TestGridTransformation {
         let model = this.model
 
         let position = model.transform.position
-        let angle = Math.atan2(position.y, position.x) + (1 * dt) //Calc the current angle plus 1 degree per second rotation
+        let angle = Math.atan2(position.y, position.x) + (3 * dt) //Calc the current angle plus 1 degree per second rotation
         let radius = Math.sqrt(position.x * position.x + position.y * position.y) //Calc the distance from origin.
 
-        let scale = Math.max(0.2, Math.abs(Math.sin(angle)) * 1.2)
+        let scale = Math.max(1, Math.abs(Math.sin(angle)) * 1.2)
 
-        model.setScale(scale, scale / 4, 1)
+        let rotationX = 30 * dt
+        let rotationY = 30 * dt
+        let rotationZ = 90 * dt
+
+        model.setScale(scale, scale, 1)
              .setPosition(radius * Math.cos(angle), radius * Math.sin(angle), 0)
-             .addRotation(30 * dt, 60 * dt, 15 * dt)
+             .addRotation(rotationX, rotationY, rotationZ)
              .preRender()
             
         this.shader.activate()

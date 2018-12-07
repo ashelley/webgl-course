@@ -51,4 +51,9 @@ export default class GLInstance {
 
         return this
     }
+
+    fitScreen(widthPercentage:number = 1, heightPercentage:number = 1) {
+        this.setSize(window.innerWidth * (widthPercentage || 1), window.innerHeight * (heightPercentage || 1))
+        return this
+    }
 }

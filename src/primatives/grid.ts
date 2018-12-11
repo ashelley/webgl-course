@@ -3,7 +3,7 @@ import { VAO } from "../shaders/createMeshVAO";
 import { createVertexArray, bindVertexArray } from "../shaders/vertexArray";
 import { ATTR_POSITION_LOC } from "../shaders/standardAttributeLocations";
 
-let createGrid = (gl:GLInstance, includeAxis?:boolean) => {
+let grid = (gl:GLInstance, includeAxis?:boolean) => {
     let glContext = gl.glContext
 
     let verts = []
@@ -94,4 +94,4 @@ let createGrid = (gl:GLInstance, includeAxis?:boolean) => {
     return vao
 }
 
-export default createGrid
+export default grid

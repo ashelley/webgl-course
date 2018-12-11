@@ -2,7 +2,7 @@ import GLInstance from "../../GLInstance";
 
 import RenderLoop from "../../RenderLoop";
 import createMeshVAO, { VAO } from "../../shaders/createMeshVAO";
-import createGrid from "../../primatives/grid";
+import grid from "../../primatives/grid";
 import Model from "../../primatives/Model";
 import Camera from "../../primatives/Camera";
 import CameraController from "../../primatives/CameraController";
@@ -33,7 +33,7 @@ export default class TestMouseController {
 
         this.shader = new GridAxisShader(gl, this.camera.projectionMatrix)
 
-        let gridVao = createGrid(gl, true)
+        let gridVao = grid(gl, true)
 
         this.model = new Model(gridVao)
     }

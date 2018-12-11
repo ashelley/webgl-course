@@ -9,11 +9,21 @@ export default class GLInstance {
         this.canvas = canvas
         this.glContext = canvas.getContext("webgl2") as WebGLRenderingContext
 
+
+
         this.initialize()
     }
 
     initialize() {
         let gl = this.glContext
+
+        gl.cullFace(gl.BACK)
+        gl.frontFace(gl.CCW)
+        gl.enable(gl.DEPTH_TEST)
+        gl.enable(gl.CULL_FACE)
+        gl.depthFunc(gl.LEQUAL)
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+
         gl.clearColor(1.0,1.0,1.0,1.0)
     }
 

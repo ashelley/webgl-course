@@ -3,7 +3,7 @@ import GLInstance from "../../GLInstance";
 import RenderLoop from "../../RenderLoop";
 import createMeshVAO, { VAO } from "../../shaders/createMeshVAO";
 import Shader from "./shader";
-import createGrid from "../../primatives/grid";
+import grid from "../../primatives/grid";
 import Model from "../../primatives/Model";
 
 export default class TestGridTransformation {
@@ -22,7 +22,7 @@ export default class TestGridTransformation {
         let gl = this.gl
         this.shader = new Shader(gl, [0.8,0.8,0.8, 1,0,0, 0,1,0, 0,0,1]) // Gray Red Green Blue
 
-        let gridVao = createGrid(gl)
+        let gridVao = grid(gl)
 
         this.model = new Model(gridVao)
     }

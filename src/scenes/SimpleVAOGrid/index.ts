@@ -3,7 +3,7 @@ import GLInstance from "../../GLInstance";
 import RenderLoop from "../../RenderLoop";
 import createMeshVAO, { VAO } from "../../shaders/createMeshVAO";
 import Shader from "./shader";
-import createGrid from "../../primatives/grid";
+import grid from "../../primatives/grid";
 
 export default class SimpleVAOGrid {
 
@@ -21,7 +21,7 @@ export default class SimpleVAOGrid {
         let gl = this.gl
         this.shader = new Shader(gl, [0.8,0.8,0.8, 1,0,0, 0,1,0, 0,0,1]) // Gray Red Green Blue
         debugger
-        this.grid = createGrid(gl)                
+        this.grid = grid(gl)                
     }
 
     start() {

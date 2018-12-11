@@ -68,7 +68,15 @@ export default class Shader {
 
 	render(vao:Partial<VAO>) {
         let glContext = this.gl.glContext
-		bindVertexArray(glContext, vao.vao)
+        bindVertexArray(glContext, vao.vao)
+        
+        if(vao.noCulling) {
+            glContext.disable(glContext.CULL_FACE)
+        }
+
+        if(vao.doBlending) {
+            glContext.enable(glContext.BLEND)
+        }
 		
 		if(vao.indexCount) {
             glContext.drawElements(vao.drawMode, vao.indexCount, glContext.UNSIGNED_SHORT, 0)

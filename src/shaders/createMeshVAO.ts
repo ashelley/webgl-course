@@ -14,9 +14,12 @@ export interface VAO {
 
     bufIndex: WebGLBuffer
     indexCount: number
+
+    noCulling:boolean
+    doBlending:boolean
 }
 
-let cache:{[name:string]:VAO} = {}
+//let cache:{[name:string]:VAO} = {}
 
 let createMeshVAO = (glContext:WebGLRenderingContext, name:string, indicies:Uint16Array, 
                         vertices:Float32Array, normals:Float32Array = null, uvs:Float32Array = null):VAO => {
@@ -43,8 +46,8 @@ let createMeshVAO = (glContext:WebGLRenderingContext, name:string, indicies:Uint
     if(normals != null) {
         result.bufNormals = glContext.createBuffer()
 
-        glContext.bindBuffer(glContext.ELEMENT_ARRAY_BUFFER, result.bufNormals)
-        glContext.bufferData(glContext.ELEMENT_ARRAY_BUFFER, normals, glContext.STATIC_DRAW)
+        glContext.bindBuffer(glContext.ARRAY_BUFFER, result.bufNormals)
+        glContext.bufferData(glContext.ARRAY_BUFFER, normals, glContext.STATIC_DRAW)
 
         glContext.enableVertexAttribArray(ATTR_NORMAL_LOC)
         glContext.vertexAttribPointer(ATTR_NORMAL_LOC,3,glContext.FLOAT,false,0,0)
@@ -53,8 +56,8 @@ let createMeshVAO = (glContext:WebGLRenderingContext, name:string, indicies:Uint
     if(uvs != null) {
         result.bufUV = glContext.createBuffer()
 
-        glContext.bindBuffer(glContext.ELEMENT_ARRAY_BUFFER, result.bufUV)
-        glContext.bufferData(glContext.ELEMENT_ARRAY_BUFFER, indicies, glContext.STATIC_DRAW)
+        glContext.bindBuffer(glContext.ARRAY_BUFFER, result.bufUV)
+        glContext.bufferData(glContext.ARRAY_BUFFER, uvs, glContext.STATIC_DRAW)
 
         glContext.enableVertexAttribArray(ATTR_UV_LOC)
         glContext.vertexAttribPointer(ATTR_UV_LOC,2,glContext.FLOAT,false,0,0)
@@ -66,14 +69,20 @@ let createMeshVAO = (glContext:WebGLRenderingContext, name:string, indicies:Uint
 
         glContext.bindBuffer(glContext.ELEMENT_ARRAY_BUFFER, result.bufIndex)
         glContext.bufferData(glContext.ELEMENT_ARRAY_BUFFER, indicies, glContext.STATIC_DRAW)
-        glContext.bindBuffer(glContext.ELEMENT_ARRAY_BUFFER, null)
+
     }
 
     bindVertexArray(glContext, null)
 
+    glContext.bindBuffer(glContext.ARRAY_BUFFER, null)
+
+    if(indicies != null)  {
+        glContext.bindBuffer(glContext.ELEMENT_ARRAY_BUFFER,null)
+    }
+
     let vao = result as VAO //TODO: can we check this with typing
 
-    cache[name] = vao
+    //cache[name] = vao
 
     return vao
 }

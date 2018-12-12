@@ -29,6 +29,7 @@ let createMeshVAO = (glContext:WebGLRenderingContext, name:string, indicies:Uint
     }
 
     result.vao = createVertexArray(glContext)
+    bindVertexArray(glContext, result.vao)
 
     if(vertices != null) {
         result.bufVerticies = glContext.createBuffer()
@@ -36,7 +37,7 @@ let createMeshVAO = (glContext:WebGLRenderingContext, name:string, indicies:Uint
         result.vertexCount = vertices.length / result.vertexComponentLen
 
         glContext.bindBuffer(glContext.ARRAY_BUFFER, result.bufVerticies)
-        glContext.bufferData(glContext.ARRAY_BUFFER, vertices, glContext.STATIC_DRAW)
+        glContext.bufferData(glContext.ARRAY_BUFFER, new Float32Array(vertices), glContext.STATIC_DRAW)
 
         glContext.enableVertexAttribArray(ATTR_POSITION_LOC)
         glContext.vertexAttribPointer(ATTR_POSITION_LOC,3,glContext.FLOAT,false,0,0);
@@ -47,7 +48,7 @@ let createMeshVAO = (glContext:WebGLRenderingContext, name:string, indicies:Uint
         result.bufNormals = glContext.createBuffer()
 
         glContext.bindBuffer(glContext.ARRAY_BUFFER, result.bufNormals)
-        glContext.bufferData(glContext.ARRAY_BUFFER, normals, glContext.STATIC_DRAW)
+        glContext.bufferData(glContext.ARRAY_BUFFER, new Float32Array(normals), glContext.STATIC_DRAW)
 
         glContext.enableVertexAttribArray(ATTR_NORMAL_LOC)
         glContext.vertexAttribPointer(ATTR_NORMAL_LOC,3,glContext.FLOAT,false,0,0)
@@ -57,7 +58,7 @@ let createMeshVAO = (glContext:WebGLRenderingContext, name:string, indicies:Uint
         result.bufUV = glContext.createBuffer()
 
         glContext.bindBuffer(glContext.ARRAY_BUFFER, result.bufUV)
-        glContext.bufferData(glContext.ARRAY_BUFFER, uvs, glContext.STATIC_DRAW)
+        glContext.bufferData(glContext.ARRAY_BUFFER, new Float32Array(uvs), glContext.STATIC_DRAW)
 
         glContext.enableVertexAttribArray(ATTR_UV_LOC)
         glContext.vertexAttribPointer(ATTR_UV_LOC,2,glContext.FLOAT,false,0,0)
@@ -68,7 +69,7 @@ let createMeshVAO = (glContext:WebGLRenderingContext, name:string, indicies:Uint
         result.indexCount = indicies.length
 
         glContext.bindBuffer(glContext.ELEMENT_ARRAY_BUFFER, result.bufIndex)
-        glContext.bufferData(glContext.ELEMENT_ARRAY_BUFFER, indicies, glContext.STATIC_DRAW)
+        glContext.bufferData(glContext.ELEMENT_ARRAY_BUFFER, new Uint16Array(indicies), glContext.STATIC_DRAW)
 
     }
 

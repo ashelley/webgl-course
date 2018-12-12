@@ -57,9 +57,9 @@ export default class QuadTest {
         this.camera.updateViewMatrix()
         this.gl.clear()        
             
-        // this.gridShader.activate()
-        //            .setCameraMatrix(this.camera.viewMatrix)
-        //            .renderModel(this.grid.preRender())
+        this.gridShader.activate()
+                   .setCameraMatrix(this.camera.viewMatrix)
+                   .renderModel(this.grid.preRender())
 
         this.quadShader.activate()
                     .setCameraMatrix(this.camera.viewMatrix)

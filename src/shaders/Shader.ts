@@ -53,15 +53,15 @@ export default class Shader {
         this.gl.glContext.uniformMatrix4fv(this.uniformLoc.perspective, false, matData); 
         return this; 
     }
+    
 	setModalMatrix(matData){	this.gl.glContext.uniformMatrix4fv(this.uniformLoc.modalMatrix, false, matData); return this; }
 	setCameraMatrix(matData){	this.gl.glContext.uniformMatrix4fv(this.uniformLoc.cameraMatrix, false, matData); return this; }    
 
-	preRender() {
+	// preRender() {
 
-    } 
+    // } 
 
     renderModel(model:Model) {
-        let glContext = this.gl.glContext
         this.setModalMatrix(model.transform.getViewMatrix());
         this.render(model.vao)
     }
@@ -70,13 +70,8 @@ export default class Shader {
         let glContext = this.gl.glContext
         bindVertexArray(glContext, vao.vao)
         
-        if(vao.noCulling) {
-            glContext.disable(glContext.CULL_FACE)
-        }
-
-        if(vao.doBlending) {
-            glContext.enable(glContext.BLEND)
-        }
+		if(vao.noCulling) glContext.disable(glContext.CULL_FACE);
+		if(vao.doBlending) glContext.enable(glContext.BLEND);        
 		
 		if(vao.indexCount) {
             glContext.drawElements(vao.drawMode, vao.indexCount, glContext.UNSIGNED_SHORT, 0)
@@ -85,7 +80,10 @@ export default class Shader {
             glContext.drawArrays(vao.drawMode, 0, vao.vertexCount)
         }
 
-		bindVertexArray(glContext, null)
+        bindVertexArray(glContext, null)
+        
+        if(vao.noCulling) glContext.enable(glContext.CULL_FACE);
+		if(vao.doBlending) glContext.disable(glContext.BLEND); 
 
 		return this
 	}

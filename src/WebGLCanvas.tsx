@@ -6,6 +6,7 @@ import SimpleVAOGrid from "./scenes/SimpleVAOGrid";
 import TestGridTransformation from "./scenes/TestGridTransformation";
 import TestMouseController from "./scenes/TestMouseController";
 import QuadTest from "./scenes/QuadTest";
+import TextureTest from "./scenes/TextureTest";
 
 
 export default class WebGLCanvas extends React.Component<{},{}> {
@@ -15,17 +16,20 @@ export default class WebGLCanvas extends React.Component<{},{}> {
 
     componentDidMount() {
         let gl = this.gl = new GLInstance(this.canvasRef.current)
-
         gl.setSize(500,500).clear()
- 
+        this.startScene()
+    }
+
+    async startScene() {
         //let scene = new SimpleAnimatedVertex(gl)
         //let scene = new SimpleVAO(gl)
         // let scene = new SimpleVAOGrid(gl)
         // let scene = new TestGridTransformation(gl)
         //let scene = new TestMouseController(gl)
-        let scene = new QuadTest(gl)
+        //let scene = new QuadTest(gl)
+        let scene = new TextureTest(this.gl)
 
-        scene.init()
+        await scene.init()
         scene.start()
     }
 

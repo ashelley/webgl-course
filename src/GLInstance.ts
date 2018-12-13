@@ -45,6 +45,32 @@ export default class GLInstance {
         return buffer
     }
 
+    loadTexture(name:string,image:HTMLImageElement, doYFlip:boolean = false) {
+        let glContext = this.glContext
+        let texture = glContext.createTexture()
+
+        //TODO: what is the second param?
+        // if(doYFlip) {
+        //     glContext.pixelStorei(glContext.UNPACK_FLIP_Y_WEBGL, )
+        // }
+
+        glContext.bindTexture(glContext.TEXTURE_2D, texture)
+        glContext.texImage2D(glContext.TEXTURE_2D, 0, glContext.RGBA, glContext.RGBA, glContext.UNSIGNED_BYTE, image) //Push image to GPU.
+        glContext.texParameteri(glContext.TEXTURE_2D, glContext.TEXTURE_MAG_FILTER, glContext.LINEAR) //Upscaling
+        glContext.texParameteri(glContext.TEXTURE_2D, glContext.TEXTURE_MIN_FILTER, glContext.LINEAR_MIPMAP_LINEAR) //Downscaling
+        glContext.generateMipmap(glContext.TEXTURE_2D)
+
+        glContext.bindTexture(glContext.TEXTURE_2D, null)
+
+        //TODO: turn off texture flipping
+        // if(doYFlip) {
+
+        // }
+
+        return texture
+
+    }
+
     setSize(width:number,height:number) {
         let canvas = this.canvas
         let glContext = this.glContext

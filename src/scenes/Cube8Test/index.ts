@@ -6,11 +6,11 @@ import Model from "../../primatives/Model";
 import Camera from "../../primatives/Camera";
 import CameraController from "../../primatives/CameraController";
 import { GridAxisShader } from "./GridAxisShader";
-import quad from "../../primatives/quad";
-import { TexturedQuadShader } from "./TexturedQuadShader";
+import { TexturedCube8Shader } from "./TexturedCube8Shader";
 import loadImage from "../../helpers/loadImage";
+import cube8 from "../../primatives/cube8";
 
-export default class TextureTest {
+export default class Cube8Test {
 
     gl:GLInstance
     renderLoop:RenderLoop
@@ -18,8 +18,8 @@ export default class TextureTest {
     gridShader:GridAxisShader
     grid:Model
 
-    quadShader:TexturedQuadShader
-    quad:Model
+    cubeShader:TexturedCube8Shader
+    cube8:Model
 
     camera:Camera
     cameraController:CameraController
@@ -50,12 +50,12 @@ export default class TextureTest {
         let gridVao = grid(gl, true)
         this.grid = new Model(gridVao)
 
-        this.quadShader = new TexturedQuadShader(gl, this.camera.projectionMatrix)
+        this.cubeShader = new TexturedCube8Shader(gl, this.camera.projectionMatrix)
+        this.cubeShader.setTexture(testPattern)
 
-        this.quadShader.setTexture(testPattern)
-
-        let quadVao = quad(gl)
-        this.quad = new Model(quadVao)
+        let cube8Vao = cube8(gl)
+        this.cube8 = new Model(cube8Vao)
+        //this.cube8.setPosition(0,0.6,0)
     }
 
     start() {
@@ -70,9 +70,9 @@ export default class TextureTest {
                    .setCameraMatrix(this.camera.viewMatrix)
                    .renderModel(this.grid.preRender())
 
-        this.quadShader.activate()
+        this.cubeShader.activate()
                     .preRender()
                     .setCameraMatrix(this.camera.viewMatrix)
-                    .renderModel(this.quad.preRender())
+                    .renderModel(this.cube8.preRender())
     }
 }

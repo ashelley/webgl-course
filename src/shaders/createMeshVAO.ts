@@ -40,7 +40,7 @@ let createMeshVAO = (glContext:WebGLRenderingContext, name:string, indicies:Uint
         glContext.bufferData(glContext.ARRAY_BUFFER, vertices, glContext.STATIC_DRAW)
 
         glContext.enableVertexAttribArray(ATTR_POSITION_LOC)
-        glContext.vertexAttribPointer(ATTR_POSITION_LOC,3,glContext.FLOAT,false,0,0);
+        glContext.vertexAttribPointer(ATTR_POSITION_LOC,result.vertexComponentLen,glContext.FLOAT,false,0,0);
 
     }
 

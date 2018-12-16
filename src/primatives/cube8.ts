@@ -22,10 +22,10 @@ let cube8 = (gl:GLInstance) => {
 
     let aVert = new Float32Array([ 
           //0             //1               //2              //3
-         -0.5,0.5,0.5,   -0.5,-0.5,0.5,  0.5,-0.5,0.5,   0.5,0.5,0.5, //FRONT
+         -0.5,0.5,0.5,0,   -0.5,-0.5,0.5,0,  0.5,-0.5,0.5,0,   0.5,0.5,0.5,0, //FRONT
 
          //4              //5               //6                //7
-         0.5,0.5,-0.5,  0.5,-0.5,-0.5,  -0.5,-0.5,-0.5,   -0.5,0.5,-0.5 //BACK
+         0.5,0.5,-0.5,0,  0.5,-0.5,-0.5,0,  -0.5,-0.5,-0.5,0,   -0.5,0.5,-0.5,0 //BACK
     ])
 
     let aUV = new Float32Array([ 
@@ -42,7 +42,7 @@ let cube8 = (gl:GLInstance) => {
         1,2,6, 6,2,5  // BOTTOM
     ])
 
-    let mesh = createMeshVAO(gl.glContext,"Cube8",aIndex,aVert,null,aUV,3);
+    let mesh = createMeshVAO(gl.glContext,"Cube8",aIndex,aVert,null,aUV,4);
     mesh.noCulling = true;
     mesh.doBlending = true;
     return mesh;

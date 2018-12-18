@@ -8,6 +8,7 @@ import TestMouseController from "./scenes/TestMouseController";
 import QuadTest from "./scenes/QuadTest";
 import TextureTest from "./scenes/TextureTest";
 import Cube8Test from "./scenes/Cube8Test";
+import CubeTest from "./scenes/CubeTest";
 
 
 export default class WebGLCanvas extends React.Component<{},{}> {
@@ -29,7 +30,8 @@ export default class WebGLCanvas extends React.Component<{},{}> {
         //let scene = new TestMouseController(gl)
         //let scene = new QuadTest(gl)
         //let scene = new TextureTest(this.gl)
-        let scene = new Cube8Test(this.gl)
+        //let scene = new Cube8Test(this.gl)
+        let scene = new CubeTest(this.gl)
 
         await scene.init()
         scene.start()

@@ -64,6 +64,7 @@ export default class Shader {
     renderModel(model:Model) {
         this.setModalMatrix(model.transform.getViewMatrix());
         this.render(model.vao)
+        return this
     }
 
 	render(vao:Partial<VAO>) {

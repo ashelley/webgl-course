@@ -12,8 +12,12 @@ import { TexturedCubeShader } from "./TexturedCubeShader";
 import loadCubeMap from "../../shaders/loadCubeMap";
 import { CubeMapShader } from "./CubeMapShader";
 import Matrix4 from "../../helpers/Matrix4";
+import { loadTextFile } from "../../helpers/loadFile";
+import parseObjFile from "../../helpers/parseObjFile";
+import createMeshVAO from "../../shaders/createMeshVAO";
+import createObjVAO from "../../shaders/createObjVAO";
 
-export default class CubeMap {
+export default class ObjTest {
 
     gl:GLInstance
     renderLoop:RenderLoop
@@ -22,7 +26,8 @@ export default class CubeMap {
     grid:Model
 
     cubeShader:TexturedCubeShader
-    cube:Model
+    cube:Model    
+    cubeObj:Model
 
     skyMapShader:CubeMapShader
     skyMap:Model
@@ -91,8 +96,16 @@ export default class CubeMap {
 
         this.cubeShader = new TexturedCubeShader(gl, this.camera.projectionMatrix)
         this.cubeShader.setTexture(testPattern)
-        let cubeVAO = cube(gl)
+        
+        let cubeVAO = cube(gl,1,1,1,2, 0, -1)
         this.cube = new Model(cubeVAO)
+
+        let cubeObjSource = await loadTextFile({url: "models/cube.obj"})
+        let cubeObjParsed = parseObjFile(cubeObjSource, true)
+        let cubeObjVAO = createObjVAO(gl.glContext, "cube-obj", cubeObjParsed)
+        this.cubeObj = new Model(cubeObjVAO)
+        //this.cubeObj.setPosition(2,0,-1)
+        this.cubeObj.setScale(0.5,0.5,0.5)
 
         let skymapVAO = cube(gl,10,10,10)
         this.skyMap = new Model(skymapVAO)    
@@ -125,5 +138,6 @@ export default class CubeMap {
                     .setCameraMatrix(this.camera.viewMatrix)
                     .setTime(performance.now())                            
                     .renderModel(this.cube.preRender())
+                    .renderModel(this.cubeObj.preRender())
     }
 }

@@ -10,6 +10,7 @@ import TextureTest from "./scenes/TextureTest";
 import Cube8Test from "./scenes/Cube8Test";
 import CubeTest from "./scenes/CubeTest";
 import CubeMap from "./scenes/CubeMap";
+import ObjTest from "./scenes/ObjTest";
 
 
 export default class WebGLCanvas extends React.Component<{},{}> {
@@ -33,7 +34,8 @@ export default class WebGLCanvas extends React.Component<{},{}> {
         //let scene = new TextureTest(this.gl)
         //let scene = new Cube8Test(this.gl)
         //let scene = new CubeTest(this.gl)
-        let scene = new CubeMap(this.gl)
+        //let scene = new CubeMap(this.gl)
+        let scene = new ObjTest(this.gl)
 
         await scene.init()
         scene.start()

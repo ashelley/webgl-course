@@ -20,4 +20,19 @@ let loadImage = async (src:string) => {
     })              
 }
 
+export let loadImages = async (imageSources:{[id:string]:string}) => {
+    let loadedImages:{[id:string]: HTMLImageElement} = {}
+    let keys = Object.keys(imageSources)
+    for(let id of keys) {
+        let src = imageSources[id]
+        let loadedImage = await loadImage(src)
+        if(loadedImage == null) {
+            throw new Error("Failed to load image: " + src)
+        }
+        loadedImages[id] = loadedImage.image
+    }
+
+    return loadedImages
+}
+
 export default loadImage

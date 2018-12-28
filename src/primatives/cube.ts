@@ -1,7 +1,7 @@
 import GLInstance from "../GLInstance";
 import createMeshVAO from "../shaders/createMeshVAO";
 
-let cube = (gl:GLInstance, width:number, height:number,length:number,x:number,y:number,z:number) => {
+let cube = (gl:GLInstance, width:number = 1, height:number = 1,length:number = 1,x:number = 0,y:number = 0,z:number = 0) => {
 
     /*
 

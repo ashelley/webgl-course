@@ -452,4 +452,11 @@ export default class Matrix4 {
 		out[14] = out[2] * x + out[6] * y + out[10]	* z + out[14];
 		out[15] = out[3] * x + out[7] * y + out[11]	* z + out[15];
 	}
+
+
+	static removeTranslation(raw:Float32Array) {
+		var mat = new Float32Array(raw);
+		mat[12] = mat[13] = mat[14] = 0.0; //Reset Translation position in the Matrix to zero.
+		return mat;		
+	}
 }

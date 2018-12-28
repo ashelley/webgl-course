@@ -103,6 +103,7 @@ export default class ObjTest {
         let cubeObjSource = await loadTextFile({url: "models/cube.obj"})
         let cubeObjParsed = parseObjFile(cubeObjSource, true)
         let cubeObjVAO = createObjVAO(gl.glContext, "cube-obj", cubeObjParsed)
+        cubeObjVAO.noCulling = true
         this.cubeObj = new Model(cubeObjVAO)
         //this.cubeObj.setPosition(2,0,-1)
         this.cubeObj.setScale(0.5,0.5,0.5)

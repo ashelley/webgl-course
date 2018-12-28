@@ -68,8 +68,8 @@ let vertexShaderGLSL = `#version 300 es
     void main(void) {
         texCoord = a_uv;
         color = vec4(uColor[int(a_position.w)], 1.0);
-        gl_Position = uPMatrix * uCameraMatrix * uMVMatrix * vec4(a_position.xyz, 1.0);
-        //gl_Position = uPMatrix * uCameraMatrix * uMVMatrix * vec4(warp(a_position.xyz), 1.0);
+        //gl_Position = uPMatrix * uCameraMatrix * uMVMatrix * vec4(a_position.xyz, 1.0);
+        gl_Position = uPMatrix * uCameraMatrix * uMVMatrix * vec4(warp(a_position.xyz), 1.0);
     }
 `
 

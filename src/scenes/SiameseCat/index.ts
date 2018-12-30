@@ -7,18 +7,16 @@ import Camera from "../../primatives/Camera";
 import CameraController from "../../primatives/CameraController";
 import { GridAxisShader } from "./GridAxisShader";
 import { loadImages } from "../../helpers/loadImage";
-import cube from "../../primatives/cube";
-import { TexturedCubeShader } from "./TexturedCubeShader";
 import loadCubeMap from "../../shaders/loadCubeMap";
 import { CubeMapShader } from "./CubeMapShader";
 import Matrix4 from "../../helpers/Matrix4";
 import { loadTextFile } from "../../helpers/loadFile";
 import parseObjFile from "../../helpers/parseObjFile";
-import createMeshVAO from "../../shaders/createMeshVAO";
 import createObjVAO from "../../shaders/createObjVAO";
 import { TexturedModelShader } from "./TexturedModelShader";
+import cube from "../../primatives/cube";
 
-export default class ObjTest {
+export default class SiameseCat {
 
     gl:GLInstance
     renderLoop:RenderLoop
@@ -26,14 +24,8 @@ export default class ObjTest {
     gridShader:GridAxisShader
     grid:Model
 
-    cubeShader:TexturedCubeShader
-    cube:Model    
-    cubeObj:Model
-
     modelShader:TexturedModelShader
-    pirateGirl:Model
-    pirateGirlTexture:WebGLTexture
-    susan:Model
+    cat:Model
 
     skyMapShader:CubeMapShader
     skyMap:Model
@@ -59,8 +51,7 @@ export default class ObjTest {
 
 
         let imagesToLoad = {
-            'uv-grid': "images/UV_Grid_Lrg.jpg",
-            'pirate-girl': "images/pirate_girl.png",
+            'siamese-cat': "images/cat_tex512.png",
             'day-back': 'images/skymap-miramar/miramar_back.png',
             'day-front': 'images/skymap-miramar/miramar_front.png',
             'day-bottom': 'images/skymap-miramar/miramar_bottom.png',
@@ -76,14 +67,10 @@ export default class ObjTest {
         }
 
         let loadedImagesReq = loadImages(imagesToLoad)
-        let pirateGirlObjSourceReq = loadTextFile({url: "models/pirate_girl.obj"})
-        let cubeObjSourceReq = loadTextFile({url: "models/cube.obj"})
-        let susanObjSourceReq = loadTextFile({url: "models/susan.obj"})
+        let siameseCatObjSourceReq = loadTextFile({url: "models/siamese_cat_lowpoly.obj"})
 
         let loadedImages = await loadedImagesReq
-        let pirateGirlObjSource = await pirateGirlObjSourceReq
-        let cubeObjSource = await cubeObjSourceReq
-        let susanObjSource = await susanObjSourceReq
+        let siameseCatObjSource = await siameseCatObjSourceReq
 
         let dayCubeMap = loadCubeMap(gl.glContext, "skymap-miramar", [
             loadedImages['day-right'],
@@ -103,39 +90,19 @@ export default class ObjTest {
             loadedImages['night-front'],
         ])        
 
-        let testPattern = gl.loadTexture('uv-grid', loadedImages['uv-grid']);
-        this.pirateGirlTexture = gl.loadTexture('pirate-girl', loadedImages['pirate-girl'])
+        let siameseCatTexture = gl.loadTexture('siamese-cat', loadedImages['siamese-cat'])
 
         this.gridShader = new GridAxisShader(gl, this.camera.projectionMatrix)
         let gridVAO = grid(gl, true)
         this.grid = new Model(gridVAO)
 
-        this.cubeShader = new TexturedCubeShader(gl, this.camera.projectionMatrix)
-        this.cubeShader.setTexture(testPattern)
-        
-        let cubeVAO = cube(gl,1,1,1,2, 0, -1)
-        this.cube = new Model(cubeVAO)
-
-        let cubeObjParsed = parseObjFile(cubeObjSource, true)
-        let cubeObjVAO = createObjVAO(gl.glContext, "cube-obj", cubeObjParsed)
-        cubeObjVAO.noCulling = true
-        this.cubeObj = new Model(cubeObjVAO)
-        //this.cubeObj.setPosition(2,0,-1)
-        this.cubeObj.setScale(0.5,0.5,0.5)
-
-
-        let pirateGirlObjParsed = parseObjFile(pirateGirlObjSource, true)
-        let pirateGirlObjVAO = createObjVAO(gl.glContext, "pirate-girl", pirateGirlObjParsed)
-        this.pirateGirl = new Model(pirateGirlObjVAO)
-        this.pirateGirl.setScale(0.5,0.5,0.5)
-
-        let susanObjParsed = parseObjFile(susanObjSource, true)
-        let susanObjVAO = createObjVAO(gl.glContext, "susan", susanObjParsed)
-        this.susan = new Model(susanObjVAO)
-        this.susan.setScale(0.5,0.5,0.5)        
+        let siameseCatObjParsed = parseObjFile(siameseCatObjSource, true)
+        let siameseCatObjVAO = createObjVAO(gl.glContext, "siamese-cat", siameseCatObjParsed)
+        this.cat = new Model(siameseCatObjVAO)
+        this.cat.setScale(0.5,0.5,0.5)        
 
         this.modelShader = new TexturedModelShader(gl, this.camera.projectionMatrix)
-        this.modelShader.setTexture(this.pirateGirlTexture)
+        this.modelShader.setTexture(siameseCatTexture)
 
 
         let skymapVAO = cube(gl,10,10,10)
@@ -164,18 +131,9 @@ export default class ObjTest {
                    .setCameraMatrix(this.camera.viewMatrix)
                    .renderModel(this.grid.preRender())
 
-        this.cubeShader.activate()
-                    .preRender()
-                    .setCameraMatrix(this.camera.viewMatrix)
-                    .setTime(performance.now())                            
-                    .renderModel(this.cube.preRender())
-                    .renderModel(this.cubeObj.preRender())
-
         this.modelShader.activate()
                     .preRender()
                     .setCameraMatrix(this.camera.viewMatrix)
-                    .renderModel(this.pirateGirl.preRender())
-                    //.setTexture(null)
-                    .renderModel(this.susan.preRender())
+                    .renderModel(this.cat.preRender())
     }
 }

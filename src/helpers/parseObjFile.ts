@@ -276,14 +276,30 @@ class ObjParser {
         for(let i = 0; i < 3; i++) {
             let vertexIndex = this.parseIndex()
             this.skipSlash()
-            let uvIndex = this.parseIndex()
+            
+            let uvIndex:number
+            let next = this.peek()
+            //NOTE: when we have no uv's defined in the obj file we end u with a face like f 1//1 (blank uv index)
+            if(next.tokenType == ObjTokenType.PUNCTUATION && next.value == "/") {
+                uvIndex -1
+            } else {
+                uvIndex = this.parseIndex()
+            }
             this.skipSlash()
+            
             let normalIndex = this.parseIndex()
-
             let face = new ObjFace()
 
             let vert = this.currentObject.getVertex(vertexIndex - 1)
-            let uv = this.currentObject.getUV(uvIndex - 1)
+            
+            let uv:{u:number,v:number}
+            if(uvIndex >= 0) {
+                uv = this.currentObject.getUV(uvIndex - 1)
+            } 
+            else {
+                uv = {u: 0, v: 0}
+            }
+            
             let normal = this.currentObject.getNormal(normalIndex - 1)
 
             face.addVertex(vert.x, vert.y, vert.z)

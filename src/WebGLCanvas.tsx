@@ -12,6 +12,7 @@ import CubeTest from "./scenes/CubeTest";
 import CubeMap from "./scenes/CubeMap";
 import ObjTest from "./scenes/ObjTest";
 import SiameseCat from "./scenes/SiameseCat";
+import PhongLighting from "./scenes/PhongLighting";
 
 
 export default class WebGLCanvas extends React.Component<{},{}> {
@@ -37,7 +38,8 @@ export default class WebGLCanvas extends React.Component<{},{}> {
         //let scene = new CubeTest(this.gl)
         //let scene = new CubeMap(this.gl)
         //let scene = new ObjTest(this.gl)
-        let scene = new SiameseCat(this.gl)
+        //let scene = new SiameseCat(this.gl)
+        let scene = new PhongLighting(this.gl)
 
         await scene.init()
         scene.start()

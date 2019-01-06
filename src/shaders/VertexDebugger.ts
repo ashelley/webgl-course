@@ -1,6 +1,9 @@
 import Transform from "../primatives/Transform";
 import { rgbFromHex } from "../helpers/rbaArrayfromHex";
 import createProgram from "./createdProgram";
+import createArrayBuffer from "./createArrayBuffer";
+import Camera from "../primatives/Camera";
+import loadShaderProgram from "./loadShaderProgram";
 
 export default class VertexDebugger {
 
@@ -9,7 +12,7 @@ export default class VertexDebugger {
 
     colors:number[] = []
     mVerts:number[] = [];
-    mVertBuffer:number = 0;
+    mVertBuffer:WebGLBuffer = -1;
     mVertCount:number = 0;
     mVertexComponentLen:number = 4;
     mPointSize:number
@@ -27,15 +30,8 @@ export default class VertexDebugger {
         this.mPointSize = pntSize
 	}
 
-	addColor(color0:string,color1:string,color2:string,color3:string,color4:string,color5:string){
-
-        this.colors.push.apply(this.colors, rgbFromHex(color0))
-        this.colors.push.apply(this.colors, rgbFromHex(color1))
-        this.colors.push.apply(this.colors, rgbFromHex(color2))
-        this.colors.push.apply(this.colors, rgbFromHex(color3))
-        this.colors.push.apply(this.colors, rgbFromHex(color4))
-        this.colors.push.apply(this.colors, rgbFromHex(color5))
-
+	addColor(color:string){
+        this.colors.push.apply(this.colors, rgbFromHex(color))
 		return this;
 	}
 
@@ -66,7 +62,7 @@ export default class VertexDebugger {
 
         let glContext = this.glContext
 		//........................................
-		this.mShader			=  createProgram(glContext,vertexShader,fragmentShader,true);
+		this.mShader			=  loadShaderProgram(glContext,vertexShader,fragmentShader,true);
 		this.mUniformColor		= glContext.getUniformLocation(this.mShader,"uColorAry");
 		this.mUniformProj		= glContext.getUniformLocation(this.mShader,"uPMatrix");
 		this.mUniformCamera		= glContext.getUniformLocation(this.mShader,"uCameraMatrix");
@@ -83,36 +79,38 @@ export default class VertexDebugger {
 	}
 
 	finalize(){
-		this.mVertBuffer = this.gl.fCreateArrayBuffer(new Float32Array(this.mVerts),true);
+		this.mVertBuffer = createArrayBuffer(this.glContext, new Float32Array(this.mVerts));
 		this.createShader();
 		return this;
 	}
 
-	render(camera){
+	render(camera:Camera){
 		//Update Transform Matrix (Modal View)
-		this.transform.updateMatrix();
+		this.transform.updateMatrix()
+
+		let glContext = this.glContext
 
 		//Start up the Shader
-		this.gl.useProgram(this.mShader);
+		glContext.useProgram(this.mShader);
 
 		//Push Uniform Data
-		this.gl.uniformMatrix4fv(this.mUniformProj, false, camera.projectionMatrix); 
-		this.gl.uniformMatrix4fv(this.mUniformCamera, false, camera.viewMatrix);
-		this.gl.uniformMatrix4fv(this.mUniformModelV, false, this.transform.getViewMatrix());
-		this.gl.uniform3fv(this.mUniformCameraPos, new Float32Array( camera.transform.position.getArray() ));
+		glContext.uniformMatrix4fv(this.mUniformProj, false, camera.projectionMatrix); 
+		glContext.uniformMatrix4fv(this.mUniformCamera, false, camera.viewMatrix);
+		glContext.uniformMatrix4fv(this.mUniformModelV, false, this.transform.getViewMatrix());
+		glContext.uniform3fv(this.mUniformCameraPos, new Float32Array( camera.transform.position.asArray()));
 
 		//Activate Vertice Buffer Array
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.mVertBuffer);
-		this.gl.enableVertexAttribArray(0);
-		this.gl.vertexAttribPointer(0,this.mVertexComponentLen,this.gl.FLOAT,false,0,0);
+		glContext.bindBuffer(glContext.ARRAY_BUFFER, this.mVertBuffer);
+		glContext.enableVertexAttribArray(0);
+		glContext.vertexAttribPointer(0,this.mVertexComponentLen,glContext.FLOAT,false,0,0);
 
 		//Draw
-		this.gl.drawArrays(this.gl.POINTS,0,this.mVertCount);
+		glContext.drawArrays(glContext.POINTS,0,this.mVertCount);
 
 		//Cleanup
-		this.gl.disableVertexAttribArray(0);
-		this.gl.useProgram(null);
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+		glContext.disableVertexAttribArray(0);
+		glContext.useProgram(null);
+		glContext.bindBuffer(glContext.ARRAY_BUFFER, null);
 	}
 }
 

@@ -62,7 +62,7 @@ export default class Transform {
 	}
 
 	getViewMatrix(){	return this.viewMatrix.raw; }
-	getNormalMatrix(){	return this.viewMatrix; }
+	getNormalMatrix(){	return this.normalMatrix; }
 
 	reset(){
 		this.position.set(0,0,0);

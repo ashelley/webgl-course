@@ -1,5 +1,23 @@
 import React from "react";
 import RenderLoop from "./RenderLoop";
+
+interface Color {
+    r:number,
+    g:number,
+    b:number,
+    a:number
+}
+
+let makeColor = (r:number,g:number,b:number,a:number = 255) => {
+    return {r,g,b,a}
+}
+
+let Colors = {
+    RED: makeColor(255,0,0),
+    GREEN: makeColor(0,255,0),
+    BLUE: makeColor(0,0,255)
+}
+
 export default class HtmlCanvas extends React.Component<{},{}> {
 
     canvasRef = React.createRef<HTMLCanvasElement>()
@@ -68,6 +86,8 @@ class Renderer {
     width:number
     height:number
 
+    bytesPerPixel:number = 4
+
     constructor(canvas:HTMLCanvasElement, width:number,height:number) {
         this.canvas = canvas
         this.renderingContext = canvas.getContext("2d");      
@@ -88,14 +108,56 @@ class Renderer {
         canvas.width = width
         canvas.height = height        
 
-        this.width = width
-        this.height = height
-
-        let bytesPerPixel = 4
-        let bufferSize = width*height*bytesPerPixel        
+        let bufferSize = width*height*this.bytesPerPixel        
 
         let arrayBuffer = new ArrayBuffer(bufferSize)        
-        this.screenBuffer = new Uint8ClampedArray(arrayBuffer)                               
+        this.screenBuffer = new Uint8ClampedArray(arrayBuffer)    
+
+        this.clear()
+
+
+    }
+
+    naiveLine(x0:number,y0:number,x1:number,y1:number, color:Color) {
+        for(let t = 0.0; t < 1.0; t+= 0.1) {
+            let x = Math.floor(x0 + (x1-x0)*t) 
+            let y = Math.floor(y0 + (y1-y0)*t);
+            this.setPixel(x,y,color)        
+        }
+    }
+
+    setPixel(x:number,y:number,color:Color) {        
+        let pixel = (this.height * this.width * this.bytesPerPixel) - (y * this.width * this.bytesPerPixel) + (x * this.bytesPerPixel)
+        this.screenBuffer[pixel + 0] = color.r        
+        this.screenBuffer[pixel + 1] = color.g
+        this.screenBuffer[pixel + 2] = color.b
+        this.screenBuffer[pixel + 3] = color.a
+    }
+
+    clear() {
+        let width = this.width
+        let height = this.height        
+        
+        let i = 0
+        {
+            //let currentTick = performance.now()
+            for(let y = 0; y < height; y++) {
+                for(let x = 0; x < width; x++) {
+                    this.screenBuffer[i++] = 0x0 //R
+                    this.screenBuffer[i++] = 0x0 //G
+                    this.screenBuffer[i++] = 0x0 //B
+                    this.screenBuffer[i++] = 0xFF //A
+                }
+            }
+            //console.log(performance.now() - currentTick, 'drawPixels')        
+        }        
+    }
+
+    doRenderWork() {
+        let halfWidth = this.width / 2
+        let halfHeight = this.height / 2
+        this.naiveLine(halfWidth - 100,halfHeight,halfWidth + 100,halfHeight,Colors.RED)
+        this.naiveLine(halfWidth,halfHeight-100,halfWidth,halfHeight+100,Colors.GREEN)
     }
 
     render = () => {
@@ -109,20 +171,7 @@ class Renderer {
             //console.log(performance.now() - currentTick, 'getImageData')        
         }
 
-        let i = 0
-
-        {
-            //let currentTick = performance.now()
-            for(let y = 0; y < height; y++) {
-                for(let x = 0; x < width; x++) {
-                    this.screenBuffer[i++] = 0x00 //R
-                    this.screenBuffer[i++] = 0xFF //G
-                    this.screenBuffer[i++] = 0xFF //B
-                    this.screenBuffer[i++] = 0xFF //A
-                }
-            }
-            //console.log(performance.now() - currentTick, 'drawPixels')        
-        }
+        this.doRenderWork()
 
         {
             //let currentTick = performance.now()

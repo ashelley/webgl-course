@@ -22,8 +22,7 @@ export default class RenderLoop {
     }
 
     run = () => {
-        let fps 
-        if(false) {
+        if(this.fpsLimit) {
             this.limitFps()
         }
         else {

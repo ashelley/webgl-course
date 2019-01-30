@@ -7,7 +7,8 @@ export default class HtmlCanvas extends React.Component<{},{}> {
     renderLoop:RenderLoop
 
     state = {
-        fps: 0
+        fps: 0,
+        frameRateLocked: 0
     }
 
     componentDidMount() {
@@ -31,10 +32,28 @@ export default class HtmlCanvas extends React.Component<{},{}> {
         setTimeout(this.logFps, 500)
     }
 
+    handleLockedFpsToggle = e => {
+        e.preventDefault()
+        e.stopPropagation()
+        let frameRateLocked = this.state.frameRateLocked
+        if(frameRateLocked == 0) {
+            frameRateLocked = 30
+        }
+        else {
+            frameRateLocked = 0
+        }
+        this.setState({frameRateLocked}, () => {
+            this.renderLoop.fpsLimit = frameRateLocked
+        })
+    }
+
     render() {
         return (
             <div style={{position:'relative'}}>
-                <div style={{position:'absolute', right: 0, color:'white', padding: 3}}>{this.state.fps}</div>
+                <div style={{display:'flex', flexDirection:'row', position:'absolute', right: 0}}>
+                    <button onClick={this.handleLockedFpsToggle}>{this.state.frameRateLocked ? this.state.frameRateLocked: "Variable"} FPS</button>
+                    <div style={{color:'white', padding: 3}}>{this.state.fps}</div>
+                </div>
                 <canvas ref={this.canvasRef} style={{border: '1px solid black'}} />
             </div>
         )

@@ -1,5 +1,6 @@
 import React from "react"
 import WebGLCanvas from "./WebGLCanvas";
+import HtmlCanvas from "./HtmlCanvas";
 
 export default class App extends React.Component {
 
@@ -8,7 +9,8 @@ export default class App extends React.Component {
                              flexGrow:1, 
                              backgroundColor:'#404040'}}>
                     <div style={{flexGrow:1, display:'flex', alignItems:'center', justifyContent:'center'}}>
-                        <WebGLCanvas />         
+                        {/* <WebGLCanvas />          */}
+                        <HtmlCanvas />
                     </div>
                 </div>
     }

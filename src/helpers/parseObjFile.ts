@@ -1,6 +1,8 @@
-let parseObjFile = (source:string, flipUV:boolean = false) => {
+let parseObjFile = (source:string, options:{flipYUV?:boolean,disableParseNormals?:boolean,disableParseUvs?:boolean} = {}) => {
     let parser = new ObjParser(source)
-    parser.flipYUV = flipUV
+    parser.flipYUV = !!options.flipYUV
+    parser.disableParseUv = !!options.disableParseUvs
+    parser.disableParseNormals = !!options.disableParseNormals
     parser.parse()
 
     let obj0 = parser.objects[0]
@@ -16,7 +18,7 @@ enum ObjTokenType {
     EOF = "EOF",
     NUMBER = "NUMBER",
     STRING = "STRING",
-    PUNCTUATION = "PUNC"
+    PUNCTUATION = "PUNC",
 }
 
 interface ObjFileToken {
@@ -109,6 +111,9 @@ class ObjParser {
     currentObject:Obj
     flipYUV:boolean
 
+    disableParseUv = false
+    disableParseNormals = false
+
     constructor(source:string) {
         let tokenizer = new TokenStream()
         tokenizer.tokenize(source)
@@ -140,6 +145,7 @@ class ObjParser {
 
     parse() {
         let token = this.next()
+        let i = 0
         while(true) {
             if(token.tokenType == ObjTokenType.EOF) {
                 break;
@@ -151,6 +157,7 @@ class ObjParser {
                 this.unexpectedToken()
             }
             token = this.next()
+            i++
         }    
     }
 
@@ -172,6 +179,10 @@ class ObjParser {
             this.parseObject()
         }
         else if(token.value == "v") {
+            if(this.currentObject == null) {
+                this.currentObject = new Obj()
+                this.objects.push(this.currentObject)                
+            }
             this.parseVertex()
         }
         else if(token.value == "vt") {
@@ -225,40 +236,43 @@ class ObjParser {
     }
 
     parseUV() {
-        let token = this.token()
-        if(token.tokenType !== ObjTokenType.STRING) {
-            this.unexpectedToken("Expected Command")
-        }        
-        if(token.value !== "vt") {
-            this.unexpectedToken("Expected UV")
-        }        
-        
-        let u = this.parseReal()
-        let v = this.parseReal()
-
-        if(this.flipYUV) {
-            v = 1 - v
+        if(!this.disableParseUv) {
+            let token = this.token()
+            if(token.tokenType !== ObjTokenType.STRING) {
+                this.unexpectedToken("Expected Command")
+            }        
+            if(token.value !== "vt") {
+                this.unexpectedToken("Expected UV")
+            }        
+            
+            let u = this.parseReal()
+            let v = this.parseReal()
+    
+            if(this.flipYUV) {
+                v = 1 - v
+            }    
+            this.currentObject.addUV(u,v)        
         }
-
-        this.currentObject.addUV(u,v)        
 
         this.chompLine()
     }
     
     parseNormal() {
-        let token = this.token()
-        if(token.tokenType !== ObjTokenType.STRING) {
-            this.unexpectedToken("Expected Command")
-        }        
-        if(token.value !== "vn") {
-            this.unexpectedToken("Expected Normal")
-        }        
-        
-        let x = this.parseReal()
-        let y = this.parseReal()
-        let z = this.parseReal()
+        if(!this.disableParseUv) {
+            let token = this.token()
+            if(token.tokenType !== ObjTokenType.STRING) {
+                this.unexpectedToken("Expected Command")
+            }        
+            if(token.value !== "vn") {
+                this.unexpectedToken("Expected Normal")
+            }        
+            
+            let x = this.parseReal()
+            let y = this.parseReal()
+            let z = this.parseReal()
 
-        this.currentObject.addNormal(x, y, z)        
+            this.currentObject.addNormal(x, y, z)        
+        }
 
         this.chompLine()
     }    
@@ -293,7 +307,7 @@ class ObjParser {
             let vert = this.currentObject.getVertex(vertexIndex - 1)
             
             let uv:{u:number,v:number}
-            if(uvIndex >= 0) {
+            if(!this.disableParseUv && uvIndex >= 0) {
                 uv = this.currentObject.getUV(uvIndex - 1)
             } 
             else {
@@ -353,10 +367,11 @@ class ObjParser {
                 break;
             }
             else if(next.tokenType == ObjTokenType.EOL) {
-                this.next()
-                break;
-
-            }
+                next = this.next()
+                if(this.peek().tokenType !== ObjTokenType.EOL) {
+                    break;
+                }
+            }                
             this.next()
         }
     }
@@ -400,11 +415,24 @@ class TokenStream {
                     value += ch
                     if(ch == ".") {
                         hasDecimal = true
-                    }
+                    }                    
                     i++
                     if(i < length) {
                         ch = source[i]
                     }
+
+                    if(ch == 'e') {
+                        let next = source[i+1]
+                        if(next == '-') {
+                            let exp = source[i+2]
+                            if(exp >= "0" && exp <= "9") {
+                                value += ch + next
+                                i+=2
+                                ch = exp
+                            }
+                        }
+                    }                    
+
                 } while(
                        i < length
                     && 

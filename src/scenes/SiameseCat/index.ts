@@ -96,7 +96,7 @@ export default class SiameseCat {
         let gridVAO = grid(gl, true)
         this.grid = new Model(gridVAO)
 
-        let siameseCatObjParsed = parseObjFile(siameseCatObjSource, true)
+        let siameseCatObjParsed = parseObjFile(siameseCatObjSource, {flipYUV: true})
         let siameseCatObjVAO = createObjVAO(gl.glContext, "siamese-cat", siameseCatObjParsed)
         this.cat = new Model(siameseCatObjVAO)
         this.cat.setScale(0.5,0.5,0.5)        

@@ -116,7 +116,7 @@ export default class ObjTest {
         let cubeVAO = cube(gl,1,1,1,2, 0, -1)
         this.cube = new Model(cubeVAO)
 
-        let cubeObjParsed = parseObjFile(cubeObjSource, true)
+        let cubeObjParsed = parseObjFile(cubeObjSource, {flipYUV: true})
         let cubeObjVAO = createObjVAO(gl.glContext, "cube-obj", cubeObjParsed)
         cubeObjVAO.noCulling = true
         this.cubeObj = new Model(cubeObjVAO)
@@ -124,12 +124,12 @@ export default class ObjTest {
         this.cubeObj.setScale(0.5,0.5,0.5)
 
 
-        let pirateGirlObjParsed = parseObjFile(pirateGirlObjSource, true)
+        let pirateGirlObjParsed = parseObjFile(pirateGirlObjSource, {flipYUV: true})
         let pirateGirlObjVAO = createObjVAO(gl.glContext, "pirate-girl", pirateGirlObjParsed)
         this.pirateGirl = new Model(pirateGirlObjVAO)
         this.pirateGirl.setScale(0.5,0.5,0.5)
 
-        let susanObjParsed = parseObjFile(susanObjSource, true)
+        let susanObjParsed = parseObjFile(susanObjSource, {flipYUV: true})
         let susanObjVAO = createObjVAO(gl.glContext, "susan", susanObjParsed)
         this.susan = new Model(susanObjVAO)
         this.susan.setScale(0.5,0.5,0.5)        

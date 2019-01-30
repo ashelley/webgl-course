@@ -116,7 +116,7 @@ export default class PhongLighting {
 
         this.modelShader = new LitModelShader(gl, this.camera.projectionMatrix)        
         let siameseCatTexture = gl.loadTexture('siamese-cat', loadedImages['siamese-cat'])        
-        let siameseCatObjParsed = parseObjFile(siameseCatObjSource, true)
+        let siameseCatObjParsed = parseObjFile(siameseCatObjSource, {flipYUV: true})
         let siameseCatObjVAO = createObjVAO(gl.glContext, "siamese-cat", siameseCatObjParsed)
         this.model = new Model(siameseCatObjVAO)
         this.model.setScale(0.25,0.25,0.25)        

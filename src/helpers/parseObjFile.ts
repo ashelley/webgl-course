@@ -302,7 +302,6 @@ class ObjParser {
             this.skipSlash()
             
             let normalIndex = this.parseIndex()
-            let face = new ObjFace()
 
             let vert = this.currentObject.getVertex(vertexIndex - 1)
             
@@ -313,14 +312,19 @@ class ObjParser {
             else {
                 uv = {u: 0, v: 0}
             }
-            
-            let normal = this.currentObject.getNormal(normalIndex - 1)
 
+            let normal:{x:number,y:number,z:number}
+            if(!this.disableParseNormals && normalIndex >= 0) {
+                normal = this.currentObject.getNormal(normalIndex - 1)
+            } else {
+                normal = {x: 0, y: 1, z: 0}
+            }                
+            
+            let face = new ObjFace()                    
             face.addVertex(vert.x, vert.y, vert.z)
             face.addUV(uv.u, uv.v)
             face.addNormal(normal.x, normal.y, normal.z)
-
-            this.currentObject.faces.push(face)
+            this.currentObject.faces.push(face)            
         }
 
         this.chompLine()

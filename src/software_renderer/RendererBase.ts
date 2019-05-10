@@ -1,4 +1,6 @@
-import { int, makePoint, Color, abs, swapPoint, Colors } from "./helpers";
+import { int, makePoint, Color, abs, swapPointXY, Colors, sortPointByY, sortPointByX } from "./helpers";
+import Vector2 from "../helpers/Vector2";
+import { add2d, multiply2d, subtract2d, multiply2dToScalar as multiply2dByScalar } from "../helpers/math";
 
 export abstract class RendererBase {
 
@@ -51,8 +53,8 @@ export abstract class RendererBase {
         let p0 = makePoint(x0,y0)
         let p1 = makePoint(x1,y1)
         if (abs(p0.x-p1.x)<abs(p0.y-p1.y)) { // if the line is steep, we transpose the image 
-            swapPoint(p0) 
-            swapPoint(p1)
+            swapPointXY(p0) 
+            swapPointXY(p1)
             steep = true; 
         } 
         if (p0.x>p1.x) { // make it left−to−right 
@@ -84,8 +86,8 @@ export abstract class RendererBase {
         let p0 = makePoint(x0,y0)
         let p1 = makePoint(x1,y1)
         if (abs(p0.x-p1.x)<abs(p0.y-p1.y)) { // if the line is steep, we transpose the image 
-            swapPoint(p0) 
-            swapPoint(p1)
+            swapPointXY(p0) 
+            swapPointXY(p1)
             steep = true; 
         } 
         if (p0.x>p1.x) { // make it left−to−right 
@@ -127,6 +129,95 @@ export abstract class RendererBase {
             this.setPixel(x,y,color)        
         }
     }
+
+    line(p0:Vector2, p1:Vector2, color:Color = Colors.WHITE) {
+        this.lineCalcPixelsForSlopeAccumulateError(p0.x, p0.y, p1.x, p1.y, color)
+    }
+
+    triangleWithoutOrdering(t0:Vector2, t1:Vector2, t2:Vector2, color:Color = Colors.WHITE) {
+        this.line(t0, t1, color)
+        this.line(t1, t2, color)
+        this.line(t2, t0, color)
+    }
+
+    triangleOutlineSegmented(t0:Vector2, t1:Vector2, t2:Vector2, 
+                                            colorTopLeft:Color = Colors.RED, colorTopRight:Color = Colors.GREEN, 
+                                            colorBottomLeft:Color = Colors.YELLOW, colorBottomRight:Color = Colors.PURPLE) {
+        sortPointByY(t0,t1)
+        sortPointByY(t0,t2)
+        sortPointByY(t1,t2)  
+        
+        
+        let totalHeight = t2.y - t0.y
+        for(let y = t0.y; y < t1.y; y++) {
+            let segmentHeight = t1.y - t0.y + 1
+            let alpha = (y - t0.y) / totalHeight
+            let beta = (y - t0.y) / segmentHeight
+            let a = add2d(t0, multiply2dByScalar(subtract2d(t2,t0), alpha))
+            let b = add2d(t0, multiply2dByScalar(subtract2d(t1,t0), beta))
+
+            this.setPixel(int(a.x),y,colorTopLeft)
+            this.setPixel(int(b.x),y,colorTopRight)
+        }
+
+
+        for(let y = t1.y; y < t2.y; y++) {
+            let segmentHeight = t2.y - t1.y + 1
+            let alpha = (y - t0.y) / totalHeight
+            let beta = (y - t1.y) / segmentHeight
+            let a = add2d(t0, multiply2dByScalar(subtract2d(t2,t0), alpha))
+            let b = add2d(t1, multiply2dByScalar(subtract2d(t2,t1), beta))
+
+            this.setPixel(int(a.x),y,colorBottomLeft)
+            this.setPixel(int(b.x),y,colorBottomRight)
+        }        
+
+
+    }
+
+    triangleShadedSegmented(t0:Vector2, t1:Vector2, t2:Vector2, color:Color, 
+                                                                colorBottom?:Color) {
+        sortPointByY(t0,t1)
+        sortPointByY(t0,t2)
+        sortPointByY(t1,t2)  
+
+        if(colorBottom == undefined) {
+            colorBottom = color
+        }
+        
+        
+        let totalHeight = t2.y - t0.y
+        for(let y = t0.y; y < t1.y; y++) {
+            let segmentHeight = t1.y - t0.y + 1
+            let alpha = (y - t0.y) / totalHeight
+            let beta = (y - t0.y) / segmentHeight
+            let a = add2d(t0, multiply2dByScalar(subtract2d(t2,t0), alpha))
+            let b = add2d(t0, multiply2dByScalar(subtract2d(t1,t0), beta))
+
+            sortPointByX(a,b)
+
+            for(let x = int(a.x); x < int(b.x); x++) {
+                this.setPixel(x,y,color)
+            }
+        }
+
+
+        for(let y = t1.y; y < t2.y; y++) {
+            let segmentHeight = t2.y - t1.y + 1
+            let alpha = (y - t0.y) / totalHeight
+            let beta = (y - t1.y) / segmentHeight
+            let a = add2d(t0, multiply2dByScalar(subtract2d(t2,t0), alpha))
+            let b = add2d(t1, multiply2dByScalar(subtract2d(t2,t1), beta))
+
+            sortPointByX(a,b)
+
+            for(let x = int(a.x); x < int(b.x); x++) {
+                this.setPixel(x,y,colorBottom)
+            }
+        }        
+
+
+    }    
 
     setPixel(x:number,y:number,color:Color) {        
         let pixel = (this.height * this.width * this.bytesPerPixel) - (y * this.width * this.bytesPerPixel) + (x * this.bytesPerPixel)

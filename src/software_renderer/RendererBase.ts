@@ -1,6 +1,8 @@
 import { int, makePoint, Color, abs, swapPointXY, Colors, sortPointByY, sortPointByX, Point } from "./helpers";
 import Vector2 from "../helpers/Vector2";
 import { add2d, multiply2d, subtract2d, multiply2dToScalar as multiply2dByScalar } from "../helpers/math";
+import { boundingBox } from "../helpers/boundingBox";
+import { pointInTriangle } from "../helpers/pointInTriangle";
 
 export abstract class RendererBase {
 
@@ -218,6 +220,18 @@ export abstract class RendererBase {
 
 
     }    
+
+    triangleShadedBBoxBaryCentric(t0:Vector2, t1:Vector2,t2:Vector2, color:Color) {
+        var points:[Vector2,Vector2,Vector2] = [t0,t1,t2]
+        var bbox = boundingBox(t0,t1,t2)
+        for(var x = bbox.min.x; x < bbox.max.x; x++) {
+            for(var y = bbox.min.y; y < bbox.max.y; y++) {
+                if(pointInTriangle({x,y}, points)) {
+                    this.setPixel(x,y,color)
+                }
+            }
+        }
+    }
 
     setPixel(x:number,y:number,color:Color) {        
         let pixel = (this.height * this.width * this.bytesPerPixel) - (y * this.width * this.bytesPerPixel) + (x * this.bytesPerPixel)

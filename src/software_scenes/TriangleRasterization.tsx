@@ -61,15 +61,8 @@ class Renderer extends RendererBase {
         var v1 = vec2(10,10)
         var v2 = vec2(100,30)
         var v3 = vec2(190,160)
-        var points:[Vector2,Vector2,Vector2] = [v1,v2,v3]
-        var bbox = boundingBox(v1,v2,v3)
-        for(var x = bbox.min.x; x < bbox.max.x; x++) {
-            for(var y = bbox.min.y; y < bbox.max.y; y++) {
-                if(pointInTriangle({x,y}, points)) {
-                    this.setPixel(x,y,Colors.PURPLE)
-                }
-            }
-        }
+
+        this.triangleShadedBBoxBaryCentric(v1,v2,v3,Colors.PURPLE)
     }
 
     doRenderWork() {

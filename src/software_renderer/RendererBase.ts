@@ -1,4 +1,4 @@
-import { int, makePoint, Color, abs, swapPointXY, Colors, sortPointByY, sortPointByX } from "./helpers";
+import { int, makePoint, Color, abs, swapPointXY, Colors, sortPointByY, sortPointByX, Point } from "./helpers";
 import Vector2 from "../helpers/Vector2";
 import { add2d, multiply2d, subtract2d, multiply2dToScalar as multiply2dByScalar } from "../helpers/math";
 

@@ -5,6 +5,8 @@ import { loadTextFile } from "../helpers/loadFile";
 import parseObjFile, { Obj } from "../helpers/parseObjFile";
 import scaleNumberIntoRange from "../helpers/scaleNumberIntoRange";
 import Vector2 from "../helpers/Vector2";
+import { boundingBox } from "../helpers/boundingBox";
+import { pointInTriangle } from "../helpers/pointInTriangle";
 
 export default class TriangleRasterization extends SoftwareSceneBase {
     createRenderer(canvas: HTMLCanvasElement, width: number, height: number) {
@@ -55,11 +57,27 @@ class Renderer extends RendererBase {
         this.triangleShadedSegmented(vec2(180,150), vec2(120,160), vec2(130,180), Colors.GREEN)
     }
 
+    boundingBoxBarryCentricTriangles() {
+        var v1 = vec2(10,10)
+        var v2 = vec2(100,30)
+        var v3 = vec2(190,160)
+        var points:[Vector2,Vector2,Vector2] = [v1,v2,v3]
+        var bbox = boundingBox(v1,v2,v3)
+        for(var x = bbox.min.x; x < bbox.max.x; x++) {
+            for(var y = bbox.min.y; y < bbox.max.y; y++) {
+                if(pointInTriangle({x,y}, points)) {
+                    this.setPixel(x,y,Colors.PURPLE)
+                }
+            }
+        }
+    }
+
     doRenderWork() {
         //this.simpleOutlinedTriangles()
         //this.boundaryTriangles()
         //this.segmentedTrigangles()
-        this.shadedTriangles()
+        //this.shadedTriangles()
+        this.boundingBoxBarryCentricTriangles()
     }
     
 }

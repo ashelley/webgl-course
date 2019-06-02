@@ -62,7 +62,7 @@ class Renderer extends RendererBase {
         var v2 = vec2(100,30)
         var v3 = vec2(190,160)
 
-        this.triangleShadedBBoxBaryCentric(v1,v2,v3,Colors.PURPLE)
+        this.triangleShadedBBoxPointsInTriangle(v1,v2,v3,Colors.PURPLE)
     }
 
     doRenderWork() {

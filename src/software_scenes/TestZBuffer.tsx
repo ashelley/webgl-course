@@ -8,7 +8,7 @@ import PseudoRandom from "../helpers/PseudoRandom";
 import { calculateSurfaceNormal } from "../helpers/calculateSurfaceNormal";
 import { normalize, multiply2d, multiply3d, dot } from "../helpers/math";
 
-export default class TestSimpleShading extends SoftwareSceneBase {
+export default class TestZBuffer extends SoftwareSceneBase {
     createRenderer(canvas: HTMLCanvasElement, width: number, height: number) {
         return new Renderer(canvas, width, height)
     }
@@ -21,14 +21,12 @@ class Renderer extends RendererBase {
     rng = new PseudoRandom(120921321312)
 
     async init() {
-        let objSource = await loadTextFile({url: "models/african_head.obj"})
+        //let objSource = await loadTextFile({url: "models/african_head.obj"})
         //let objSource = await loadTextFile({url: "models/cube.obj"})
-        //let objSource = await loadTextFile({ url: "models/siamese_cat_lowpoly.obj" })
+        let objSource = await loadTextFile({ url: "models/siamese_cat_lowpoly.obj" })
         this.obj = parseObjFile(objSource, { flipYUV: true, disableParseUvs: true, disableParseNormals: true })
-    }
 
-    getVertForFace() {
-
+        this.setupZBuffer()
     }
 
     doRenderWork() {
@@ -56,7 +54,7 @@ class Renderer extends RendererBase {
             let width = this.width
             let height = this.height
 
-            let scale = 1
+            let scale = 0.5
 
             width = 600
             height = 600
@@ -72,6 +70,7 @@ class Renderer extends RendererBase {
 
             x1 = Math.floor(scaleNumberIntoRange(x1, -1, 1, 0, width)) + translateX
             y1 = Math.floor(scaleNumberIntoRange(y1, -1, 1, 0, height)) - translateY
+            z1 = Math.floor(z1)
 
             x2 = Math.floor(scaleNumberIntoRange(x2, -1, 1, 0, width)) + translateX
             y2 = Math.floor(scaleNumberIntoRange(y2, -1, 1, 0, height)) - translateY
@@ -85,10 +84,10 @@ class Renderer extends RendererBase {
 
             if (intensity > 0) {
                 let color = makeColor(255 * intensity, 255 * intensity, 255 * intensity)
-                let t0 = vec2(x0, y0)
-                let t1 = vec2(x1, y1)
-                let t2 = vec2(x2, y2)
-                this.triangleShadedBBoxPointsInTriangle(t0, t1, t2, color)
+                let t0 = vec3(x0, y0, z0)
+                let t1 = vec3(x1, y1, z1)
+                let t2 = vec3(x2, y2, z2)
+                this.triangleShadedZBuffer(t0, t1, t2, color)
             }
 
             i+=3

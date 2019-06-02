@@ -68,7 +68,7 @@ class Renderer extends RendererBase {
                 let t1 = vec2(x1,y1)
                 let t2 = vec2(x2,y2)
                 
-                this.triangleShadedBBoxBaryCentric(t0,t1,t2,color)
+                this.triangleShadedBBoxPointsInTriangle(t0,t1,t2,color)
             }
         }
     }

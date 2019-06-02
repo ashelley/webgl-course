@@ -1,14 +1,16 @@
 import { int, makePoint, Color, abs, swapPointXY, Colors, sortPointByY, sortPointByX, Point } from "./helpers";
 import Vector2 from "../helpers/Vector2";
-import { add2d, multiply2d, subtract2d, multiply2dToScalar as multiply2dByScalar } from "../helpers/math";
+import { add2d, multiply2d, subtract2d, multiply2dToScalar as multiply2dByScalar, barycentric } from "../helpers/math";
 import { boundingBox } from "../helpers/boundingBox";
 import { pointInTriangle } from "../helpers/pointInTriangle";
+import Vector3 from "../helpers/Vector3";
 
 export abstract class RendererBase {
 
     canvas:HTMLCanvasElement
     renderingContext: CanvasRenderingContext2D
     screenBuffer:Uint8ClampedArray    
+    zBuffer:Float32Array
     width:number
     height:number
 
@@ -37,9 +39,19 @@ export abstract class RendererBase {
         let bufferSize = width*height*this.bytesPerPixel        
 
         let arrayBuffer = new ArrayBuffer(bufferSize)        
-        this.screenBuffer = new Uint8ClampedArray(arrayBuffer)    
+        this.screenBuffer = new Uint8ClampedArray(arrayBuffer)
+        
+        if(this.zBuffer != null) {
+            this.setupZBuffer()
+        }
 
         this.clear()
+    }
+
+    setupZBuffer() {
+        let bufferSize = this.width*this.height * 4
+        let arrayBuffer = new ArrayBuffer(bufferSize)
+        this.zBuffer = new Float32Array(arrayBuffer)
     }
 
     lineCalcPixels(x0:number, y0:number, x1:number, y1:number, color:Color) { 
@@ -221,7 +233,7 @@ export abstract class RendererBase {
 
     }    
 
-    triangleShadedBBoxBaryCentric(t0:Vector2, t1:Vector2,t2:Vector2, color:Color) {
+    triangleShadedBBoxPointsInTriangle(t0:Vector2, t1:Vector2,t2:Vector2, color:Color) {
         var points:[Vector2,Vector2,Vector2] = [t0,t1,t2]
         var bbox = boundingBox(t0,t1,t2)
         for(var x = bbox.min.x; x < bbox.max.x; x++) {
@@ -231,6 +243,26 @@ export abstract class RendererBase {
                 }
             }
         }
+    }
+
+    triangleShadedZBuffer(t0:Vector3,t1:Vector3,t2:Vector3, color:Color) {
+        let points:[Vector3,Vector3,Vector3] = [t0,t1,t2]
+        let bbox = boundingBox(t0,t1,t2)
+        for(let x = bbox.min.x; x < bbox.max.x; x++) {
+            for(let y = bbox.min.y; y < bbox.max.y; y++) {
+                let p = {x,y,z:0}
+                var bc = barycentric(p,points)
+                if(bc.x < 0 || bc.y < 0 || bc.z < 0) continue
+                p.z += t0.z * bc.x
+                p.z += t1.z * bc.y
+                p.z += t2.z * bc.z
+                let zIndex = p.x + (p.y * this.width)
+                if(this.zBuffer[zIndex] < p.z) {
+                    this.zBuffer[zIndex] = p.z
+                    this.setPixel(p.x,p.y,color)
+                }
+            }
+        }        
     }
 
     setPixel(x:number,y:number,color:Color) {        

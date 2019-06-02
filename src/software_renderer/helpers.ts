@@ -1,4 +1,5 @@
 import Vector2 from "../helpers/Vector2";
+import Vector3 from "../helpers/Vector3";
 
 export interface Color {
     r:number,
@@ -46,6 +47,10 @@ export let swapPoints = (p0:Point, p1:Point) => {
 
 export let vec2 = (x:number, y:number) => {
     return new Vector2(x,y)
+}
+
+export let vec3 = (x:number,y:number,z:number) => {
+    return new Vector3(x,y,z)
 }
 
 export let sortPointByY = (p0:Point, p1: Point) => {

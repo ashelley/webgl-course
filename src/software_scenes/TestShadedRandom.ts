@@ -28,7 +28,7 @@ class Renderer extends RendererBase {
         let obj = this.obj
         let i = 0;
         let items = obj.faces
-        while(i < items.length - 10) {
+        while(i < items.length) {
             for(let vertIndex = 0; vertIndex < 3; vertIndex++) {                
                 let p1 = (i++)
                 let x0 = items[p1].verts[0]

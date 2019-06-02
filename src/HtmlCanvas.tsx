@@ -3,6 +3,7 @@ import TestSoftwareLineDrawing from "./software_scenes/TestSoftwareLineDrawing";
 import TestWireFrame from "./software_scenes/TestWireFrame";
 import TriangleRasterization from "./software_scenes/TriangleRasterization";
 import TestShadedRandom from "./software_scenes/TestShadedRandom";
+import TestSimpleShading from "./software_scenes/TestSimpleShading";
 
 export default class HtmlCanvas extends React.Component<{},{}> {
 
@@ -12,7 +13,8 @@ export default class HtmlCanvas extends React.Component<{},{}> {
             // <TestSoftwareLineDrawing />
             // <TestWireFrame />
             //<TriangleRasterization />
-            <TestShadedRandom />
+            //<TestShadedRandom />
+            <TestSimpleShading />
         )
     }
 }

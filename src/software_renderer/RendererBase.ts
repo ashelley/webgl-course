@@ -4,6 +4,7 @@ import { add2d, multiply2d, subtract2d, multiply2dToScalar as multiply2dByScalar
 import { boundingBox } from "../helpers/boundingBox";
 import { pointInTriangle } from "../helpers/pointInTriangle";
 import Vector3 from "../helpers/Vector3";
+import Matrix4 from "../helpers/Matrix4";
 
 export abstract class RendererBase {
 
@@ -264,6 +265,18 @@ export abstract class RendererBase {
             }
         }        
     }
+
+    applyProjection(viewport:Float32Array, projection:Float32Array, p:Vector3) {
+        let m = Matrix4.identity()
+        Matrix4.mult(m, viewport, projection)
+        let [m0,m1,m2,m3] = Matrix4.multiplyVector(m,[p.x,p.y,p.z,1])
+
+        let x = m0/m3
+        let y = m1/m3
+        let z = m2/m3
+
+        return {x,y,z}
+    } 
 
     setPixel(x:number,y:number,color:Color) {        
         let pixel = (this.height * this.width * this.bytesPerPixel) - (y * this.width * this.bytesPerPixel) + (x * this.bytesPerPixel)

@@ -24,6 +24,7 @@ class Renderer extends RendererBase {
         //let objSource = await loadTextFile({url: "models/african_head.obj"})
         //let objSource = await loadTextFile({url: "models/cube.obj"})
         let objSource = await loadTextFile({ url: "models/siamese_cat_lowpoly.obj" })
+        //let objSource = await loadTextFile({ url: "models/susan.obj" })
         this.obj = parseObjFile(objSource, { flipYUV: true, disableParseUvs: true, disableParseNormals: true })
 
         this.setupZBuffer()
@@ -64,6 +65,10 @@ class Renderer extends RendererBase {
 
             let translateY = -150*scale
             let translateX = this.width / 2 - (300)*scale
+
+            scale = 1
+            translateX = 0
+            translateY = 0
 
             x0 = Math.floor(scaleNumberIntoRange(x0, -1, 1, 0, width)) + translateX
             y0 = Math.floor(scaleNumberIntoRange(y0, -1, 1, 0, height)) - translateY

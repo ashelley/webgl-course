@@ -53,6 +53,10 @@ export let vec3 = (x:number,y:number,z:number) => {
     return new Vector3(x,y,z)
 }
 
+export let vec3i = (x:number,y:number,z:number) => {
+    return new Vector3(Math.floor(x),Math.floor(y),Math.floor(z))
+}
+
 export let sortPointByY = (p0:Point, p1: Point) => {
     if(p0.y > p1.y) {
         swapPoints(p0, p1)

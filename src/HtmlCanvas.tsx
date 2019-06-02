@@ -5,6 +5,7 @@ import TriangleRasterization from "./software_scenes/TriangleRasterization";
 import TestShadedRandom from "./software_scenes/TestShadedRandom";
 import TestSimpleShading from "./software_scenes/TestSimpleShading";
 import TestZBuffer from "./software_scenes/TestZBuffer";
+import TestProjection from "./software_scenes/TestProjection";
 
 export default class HtmlCanvas extends React.Component<{},{}> {
 
@@ -16,7 +17,8 @@ export default class HtmlCanvas extends React.Component<{},{}> {
             //<TriangleRasterization />
             //<TestShadedRandom />
             //<TestSimpleShading />
-            <TestZBuffer />
+            //<TestZBuffer />
+            <TestProjection />
         )
     }
 }

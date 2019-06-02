@@ -205,7 +205,7 @@ export default class Matrix4 {
 
 
 	//https://github.com/gregtatum/mdn-model-view-projection/blob/master/shared/matrices.js
-	static multiplyVector(mat4:Matrix4, v:[number,number,number,number]) {
+	static multiplyVector(mat4:Float32Array, v:[number,number,number,number]) {
 		let x = v[0], y = v[1], z = v[2], w = v[3];
 		let c1r1 = mat4[ 0], c2r1 = mat4[ 1], c3r1 = mat4[ 2], c4r1 = mat4[ 3],
 			c1r2 = mat4[ 4], c2r2 = mat4[ 5], c3r2 = mat4[ 6], c4r2 = mat4[ 7],

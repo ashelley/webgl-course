@@ -146,7 +146,11 @@ export abstract class RendererBase {
     }
 
     line(p0:Vector2, p1:Vector2, color:Color = Colors.WHITE) {
-        this.lineCalcPixelsForSlopeAccumulateError(p0.x, p0.y, p1.x, p1.y, color)
+        this.lineXY(p0.x, p0.y, p1.x, p1.y, color)
+    }
+
+    lineXY(x0:number,y0:number,x1:number,y1:number, color:Color) {
+        this.lineCalcPixelsForSlopeAccumulateError(x0, y0, x1, y1, color)
     }
 
     triangleWithoutOrdering(t0:Vector2, t1:Vector2, t2:Vector2, color:Color = Colors.WHITE) {

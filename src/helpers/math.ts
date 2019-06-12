@@ -1,3 +1,5 @@
+import Vector3 from "./Vector3";
+
 export let subtract2d = (p0:{x:number,y:number}, p1:{x:number, y:number}) => {
     return {x: p0.x - p1.x, y: p0.y - p1.y} 
 }
@@ -38,6 +40,17 @@ export let normalize = (v:{x:number,y:number,z:number}) => {
 
 export let dot = (a:{x:number,y:number,z:number},b:{x:number,y:number,z:number}) => {
     return (a.x * b.x) + (a.y * b.y) + (a.z * b.z)
+}
+
+export let cross = (a:{x:number,y:number,z:number}, b:{x:number,y:number,z:number}) => {
+    //ax  ay  az  ax ay az
+    //bx  by  bz  bx by bz
+
+    let x = (a.y * b.z) - (b.y * a.z)
+    let y = (a.z * b.x) - (b.z * a.x)
+    let z = (a.x * b.y) - (b.x * a.y)
+
+    return {x,y,z}
 }
 
 export let barycentric = (p:{x:number,y:number,z:number}, triangle:[{x:number,y:number,z:number},{x:number,y:number,z:number},{x:number,y:number,z:number}]) => {

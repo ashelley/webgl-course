@@ -153,6 +153,25 @@ export abstract class RendererBase {
         this.lineCalcPixelsForSlopeAccumulateError(x0, y0, x1, y1, color)
     }
 
+    screenSpaceLine(x0:number,y0:number,x1:number,y1:number,color:Color) {
+        let screenX0 = Math.floor(x0)
+        let screenY0 = Math.floor(y0)
+        let screenX1 = Math.floor(x1)
+        let screenY1 = Math.floor(y1)
+
+        if(screenX0 < 0) screenX0 = 0
+        if(screenY0 < 0) screenY0 = 0
+        if(screenX1 < 0) screenX1 = 0
+        if(screenY1 < 0) screenY1 = 0        
+
+        if(screenX0 > this.width) screenX0 = this.width
+        if(screenY0 > this.height) screenY0 = this.height
+        if(screenX1 > this.width) screenX1 = this.width
+        if(screenY1 > this.height) screenY1 = this.height           
+
+        this.lineXY(screenX0,screenY0,screenX1,screenY1,color)
+    }        
+
     triangleWithoutOrdering(t0:Vector2, t1:Vector2, t2:Vector2, color:Color = Colors.WHITE) {
         this.line(t0, t1, color)
         this.line(t1, t2, color)
@@ -289,6 +308,14 @@ export abstract class RendererBase {
         this.screenBuffer[pixel + 2] = color.b
         this.screenBuffer[pixel + 3] = color.a
     }
+
+    setPixelF(x:number,y:number,color:Color) {        
+        let pixel = (this.height * this.width * this.bytesPerPixel) - (y * this.width * this.bytesPerPixel) + (x * this.bytesPerPixel)
+        this.screenBuffer[pixel + 0] = color.r * 255        
+        this.screenBuffer[pixel + 1] = color.g * 255
+        this.screenBuffer[pixel + 2] = color.b * 255
+        this.screenBuffer[pixel + 3] = color.a * 255
+    }    
 
     clear() {
         let width = this.width

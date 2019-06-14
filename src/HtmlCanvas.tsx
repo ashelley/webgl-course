@@ -7,6 +7,7 @@ import TestSimpleShading from "./software_scenes/TestSimpleShading";
 import TestZBuffer from "./software_scenes/TestZBuffer";
 import TestProjection from "./software_scenes/TestProjection";
 import TestMaxtrixTransform from "./software_scenes/TestMatrixTransform";
+import TestRayTracer from "./software_scenes/TestRayTracer";
 
 export default class HtmlCanvas extends React.Component<{},{}> {
 
@@ -18,9 +19,10 @@ export default class HtmlCanvas extends React.Component<{},{}> {
             //<TriangleRasterization />
             //<TestShadedRandom />
             //<TestSimpleShading />
-            //<TestZBuffer />
-            //<TestProjection />  TODO://this is not complete
-            <TestMaxtrixTransform />
+            // <TestZBuffer />
+            //<TestProjection />   //TODO: not complete
+            //<TestMaxtrixTransform />
+            <TestRayTracer />
         )
     }
 }

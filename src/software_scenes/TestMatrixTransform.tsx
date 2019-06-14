@@ -1,6 +1,6 @@
 import SoftwareSceneBase from "./SoftwareSceneBase";
 import { RendererBase } from "../software_renderer/RendererBase";
-import { Colors, makeColor, vec2, vec3, vec3i, Color } from "../software_renderer/helpers";
+import { vec2, vec3, vec3i} from "../software_renderer/helpers";
 import { loadTextFile } from "../helpers/loadFile";
 import parseObjFile, { Obj } from "../helpers/parseObjFile";
 import scaleNumberIntoRange from "../helpers/scaleNumberIntoRange";
@@ -10,6 +10,7 @@ import { normalize, multiply2d, multiply3d, dot, subtract3d, cross } from "../he
 import Matrix4 from "../helpers/Matrix4";
 import Vector3 from "../helpers/Vector3";
 import Vector2 from "../helpers/Vector2";
+import { makeRGBColor, Colors, Color } from "../primatives/Color";
 
 export default class TestMaxtrixTransform extends SoftwareSceneBase {
     createRenderer(canvas: HTMLCanvasElement, width: number, height: number) {
@@ -246,7 +247,7 @@ class Renderer extends RendererBase {
             let intensity = dot(normal, lightDir)
 
             if (intensity > 0) {
-                let color = makeColor(255 * intensity, 255 * intensity, 255 * intensity)
+                let color = makeRGBColor(255 * intensity, 255 * intensity, 255 * intensity)
 
                 color = Colors.PURPLE
                 this.shadeTriangle(v0, v1, v2, color)

@@ -3,7 +3,8 @@ export default class RenderLoop {
     fps = 0
     fpsLimit = 0
     isActive = false
-    lastFrameMs = 0
+    lastFrameMS = 0
+    lastFrameStartAt = 0
     render:(dt:number)=>void
 
     constructor(render:(dt:number)=>void) {
@@ -12,7 +13,7 @@ export default class RenderLoop {
 
     start() {
         this.isActive = true
-        this.lastFrameMs = performance.now()
+        this.lastFrameStartAt = performance.now()
         window.requestAnimationFrame(this.run)
         return this        
     }
@@ -32,11 +33,12 @@ export default class RenderLoop {
 
     variableRate() {
         let currentMs = performance.now()
-        let deltaMs = (currentMs - this.lastFrameMs)
+        let deltaMs = (currentMs - this.lastFrameStartAt)
         let deltaT = deltaMs / 1000
 
-        this.lastFrameMs = currentMs
+        this.lastFrameStartAt = currentMs
         this.fps = Math.floor(1.0/deltaT)
+        this.lastFrameMS = deltaMs
 
         this.render(deltaT)
 
@@ -47,13 +49,13 @@ export default class RenderLoop {
 
     limitFps() {
         let currentMs = performance.now()
-        let deltaMs = (currentMs - this.lastFrameMs)
+        let deltaMs = (currentMs - this.lastFrameStartAt)
 
         let deltaT = deltaMs / 1000
 
         if(deltaMs > this.fpsLimit) {
             this.fps = Math.floor(1.0/deltaT)
-            this.lastFrameMs = currentMs
+            this.lastFrameStartAt = currentMs
             this.render(deltaT)
         }
 

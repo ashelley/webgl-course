@@ -1,5 +1,9 @@
 import Vector3 from "./Vector3";
 
+export let abs = Math.abs
+export let int = Math.floor
+export let sqrt = Math.sqrt
+
 export let subtract2d = (p0:{x:number,y:number}, p1:{x:number, y:number}) => {
     return {x: p0.x - p1.x, y: p0.y - p1.y} 
 }
@@ -9,11 +13,15 @@ export let subtract3d = (p0:{x:number,y:number,z:number}, p1:{x:number, y:number
 }
 
 export let length3d = (v:{x:number,y:number,z:number}) => {
-    return Math.sqrt((v.x * v.x) + (v.y * v.y) + (v.z + v.z))
+    return sqrt(abs(v.x * v.x) + abs(v.y * v.y) + abs(v.z + v.z))
 }
 
 export let add2d = (p0:{x:number,y:number}, p1:{x:number,y:number}) => {
     return {x: p0.x + p1.x, y: p0.y + p1.y} 
+}
+
+export let add3d = (p0:{x:number,y:number,z:number}, p1:{x:number,y:number,z:number}) => {
+    return {x: p0.x + p1.x, y: p0.y + p1.y, z: p0.z + p1.z} 
 }
 
 export let multiply2d = (p0:{x:number,y:number}, p1:{x:number,y:number}) => {
@@ -22,6 +30,23 @@ export let multiply2d = (p0:{x:number,y:number}, p1:{x:number,y:number}) => {
 
 export let multiply3d = (p0:{x:number,y:number,z:number}, p1:{x:number,y:number,z:number}) => {
     return {x: p0.x * p1.x, y: p0.y * p1.y, z: p0.z * p1.z} 
+}
+
+export let multiplyColor = (c0:{r:number,g:number,b:number},c1:{r:number,g:number,b:number}) => {
+    return {r: c0.r * c1.r, g: c0.g * c1.g, b: c0.b * c1.b, a:1} 
+}
+
+export let scaleColor = (c0:{r:number,g:number,b:number},amount:number) => {
+    return {r: c0.r * amount, g: c0.g * amount, b: c0.b * amount} 
+}
+
+export let addColor = (c0:{r:number,g:number,b:number},c1:{r:number,g:number,b:number}) => {
+    return {r: c0.r + c1.r, g: c0.g + c1.g, b: c0.b + c1.b, a:1} 
+}
+
+
+export let scale3d = (p0:{x:number,y:number,z:number}, amount:number) => {
+    return {x: p0.x * amount, y: p0.y * amount, z: p0.z * amount} 
 }
 
 export let multiply2dToScalar = (p0:{x:number,y:number}, scalar:number) => {
@@ -73,3 +98,7 @@ export let barycentric = (p:{x:number,y:number,z:number}, triangle:[{x:number,y:
 
     return {x: u, y: v, z: w}
 }
+
+export let mix = (a:number, b:number, mix:number) => {
+    return b * mix + a * (1 - mix); 
+} 

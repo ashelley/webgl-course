@@ -9,7 +9,8 @@ export default abstract class SoftwareSceneBase extends React.Component<{},{}> {
     renderLoop:RenderLoop
 
     state = {
-        fps: 0,
+        fps: 0,        
+        lastFrameTime: 0,
         frameRateLocked: 0
     }
 
@@ -33,8 +34,9 @@ export default abstract class SoftwareSceneBase extends React.Component<{},{}> {
 
     logFps = () => {
         let fps = this.renderLoop.fps
-        if(fps != this.state.fps) {
-            this.setState({fps})
+        let lastFrameTime = Math.floor(this.renderLoop.lastFrameMS)
+        if(fps != this.state.fps || this.state.lastFrameTime != lastFrameTime) {
+            this.setState({fps, lastFrameTime})
         }
         setTimeout(this.logFps, 500)
     }
@@ -60,6 +62,7 @@ export default abstract class SoftwareSceneBase extends React.Component<{},{}> {
                 <div style={{display:'flex', flexDirection:'row', position:'absolute', right: 0}}>
                     <button onClick={this.handleLockedFpsToggle}>{this.state.frameRateLocked ? this.state.frameRateLocked: "Variable"} FPS</button>
                     <div style={{color:'white', padding: 3}}>{this.state.fps}</div>
+                    <div style={{color:'white', padding: 3}}>{this.state.lastFrameTime} ms</div>
                 </div>
                 <canvas ref={this.canvasRef} style={{border: '1px solid black'}} />
             </div>

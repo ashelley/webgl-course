@@ -5,7 +5,7 @@ import Vector3 from "../helpers/Vector3";
 import Vector2 from "../helpers/Vector2";
 import { Sphere, createSphere } from "../primatives/Sphere";
 import { vec3 } from "../software_renderer/helpers";
-import { makeFloatColor, Color, rgbToFloatColor, Colors } from "../primatives/Color";
+import { makeFloatColor, Color, rgbToFloatColor, Colors, makeRGBColor } from "../primatives/Color";
 import { normalize, multiply3d, scale3d, add3d, subtract3d, dot, mix, multiplyColor, scaleColor, addColor } from "../helpers/math";
 
 export default class TestRayTracer extends SoftwareSceneBase {
@@ -64,7 +64,10 @@ class Renderer extends RendererBase {
                                         reflectivity: 0, 
                                         transparency: 0,
                                         emissionColor: makeFloatColor(3,3,3)
-                                        }))                                                                               
+                                        }))         
+                                        
+                                        
+        this.setSize(640,480)                                        
 
 
 
@@ -79,30 +82,33 @@ class Renderer extends RendererBase {
         
         for(let i = 0; i < objects.length; i++) {
             let o = objects[i]
-            if(o.emissionColor) continue
             o.rayIntersect(start,direction,intersection)
             if(intersection.hit) {                
-                if (intersection.t0 < 0) {
-                    near = intersection.t0
+                let t0 = intersection.t0
+                if (t0 < 0) {
+                    t0 = intersection.t1
                 }
-                else {
-                    near = intersection.t1
+                if(t0 < near) {
+                    near = t0
                 }
                 closestObject = o
             }
         }
 
         if(closestObject == null) {
-            return this.backgroundColor
+            //return this.backgroundColor
+            return makeRGBColor(2.0,2.0,2.0,1)
         }
 
-        let surfaceColor = closestObject.surfaceColor        
+        let surfaceColor = makeFloatColor(0,0,0)     
 
         let intersectionPoint = add3d(start, scale3d(direction, near))
         let normal = subtract3d(intersectionPoint, closestObject.center)
         normalize(normal)
         
-        let bias = 1e-4
+        //let bias = 1e-4
+        let bias = 9.9999997473787516 * Math.pow(10,-5)
+
         let isInside = false
 
         if(dot(direction,normal) > 0) {
@@ -113,7 +119,7 @@ class Renderer extends RendererBase {
         if((closestObject.transparency > 0 || closestObject.reflectivity > 0) && depth < this.maxRayDepth) {
             let dotDirNormal = dot(direction,normal)
             let facingRatio = -dotDirNormal
-            let fresnelEffect = mix((1 - facingRatio)^3,1,0.1)
+            let fresnelEffect = mix(Math.pow(1 - facingRatio,3),1,0.1)
             let reflectionDir = subtract3d(direction,scale3d(normal, 2 * dotDirNormal))
             normalize(reflectionDir)
 
@@ -131,10 +137,12 @@ class Renderer extends RendererBase {
                 let refractionDir = add3d(scale3d(direction,eta),scale3d(normal, (eta * cosi) - Math.sqrt(k)))
                 normalize(refractionDir)                
 
-                refraction = this.rayTrace(vec3(startReflect.x,startReflect.y,startReflect.z), vec3(refractionDir.x,reflectionDir.y,reflectionDir.z), depth + 1)
+                let startRefract = subtract3d(intersectionPoint,scale3d(normal,bias))
+
+                refraction = this.rayTrace(vec3(startRefract.x,startRefract.y,startRefract.z), vec3(refractionDir.x,refractionDir.y,refractionDir.z), depth + 1)
             }
 
-            surfaceColor = multiplyColor(closestObject.surfaceColor,addColor(scaleColor(reflection,fresnelEffect),scaleColor(refraction,(1 - fresnelEffect)*closestObject.transparency)))
+            surfaceColor = addColor(scaleColor(reflection,fresnelEffect), multiplyColor(scaleColor(refraction,(1 - fresnelEffect) * closestObject.transparency), closestObject.surfaceColor))
         }
         else {
             for(let i = 0; i < objects.length; i++) {
@@ -153,12 +161,21 @@ class Renderer extends RendererBase {
                         }
                     }
 
-                    surfaceColor = addColor(surfaceColor, multiplyColor(surfaceColor,transmission))
+                    surfaceColor = addColor(
+                            surfaceColor, 
+                            multiplyColor(
+                                scaleColor(
+                                    multiplyColor(surfaceColor,transmission),
+                                    Math.max(0,dot(normal,lightDirection))
+                                ),o.emissionColor))
                 }
             }
         }
 
         //return addColor(surfaceColor,closestObject.emissionColor)
+        if(closestObject.emissionColor) {
+            return addColor(surfaceColor, closestObject.emissionColor)
+        }
         return surfaceColor
     }
 
@@ -175,7 +192,7 @@ class Renderer extends RendererBase {
 
         for(let y = 0; y < height; y++) {
             for(let x = 0; x < width; x++) {
-                let rayX = (2 * (x + 0.5) * inverseWidth) * angle * aspectRatio
+                let rayX = (2 * ((x + 0.5) * inverseWidth) -1 ) * angle * aspectRatio
                 let rayY = (1 - 2 * ((y + 0.5) * inverseHeight)) * angle
                 let rayDirection = vec3(rayX,rayY,-1)
                 normalize(rayDirection)

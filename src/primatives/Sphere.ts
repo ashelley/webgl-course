@@ -1,6 +1,6 @@
 import Vector3 from "../helpers/Vector3";
 import { Color } from "./Color";
-import { subtract2d, subtract3d, dot, length3d } from "../helpers/math";
+import { subtract2d, subtract3d, dot, length3d, length2 } from "../helpers/math";
 
 
 export interface InterSectResult {
@@ -34,7 +34,7 @@ export class Sphere {
         let tca = dot(l,direction)
         if (tca < 0) return //NOTE: this means the ray is going away from our sphere
         //let d2 = dot(l,l) - (tca * tca) //NOTE: this is basically doing pythorem theorm
-        let d2 = length3d(l)*length3d(l) - (tca * tca) //NOTE: this is basically doing pythorem theorm
+        let d2 = length2(l) - (tca * tca) //NOTE: this is basically doing pythorem theorm
         if (d2 > this.radiusSquared) return //NOTE: basically d2 is a fake radius, we don't bother square rooting because
                                                   //      we just need to know if d2 would be inside sphere aka less than radius
 

@@ -53,14 +53,29 @@ export let multiply2dToScalar = (p0:{x:number,y:number}, scalar:number) => {
     return {x: p0.x * scalar, y: p0.y * scalar} 
 }
 
+export let length2 = (v:{x:number,y:number,z:number}) => {
+    return dot(v,v)
+}
+
 export let normalize = (v:{x:number,y:number,z:number}) => {
-    let length = length3d(v)
-    let x = v.x / length
-    let y = v.y / length
-    let z = v.z / length
-    v.x = x
-    v.y = y
-    v.z = z
+    //T length2() const { return x * x + y * y + z * z; } 
+
+    let nor2 = length2(v)
+    if (nor2 > 0) {
+        let invNor = 1 / sqrt(nor2)
+        v.x *= invNor
+        v.y *= invNor
+        v.z *= invNor
+    }
+
+    //TODO: figure out why this was broken or why i had it to begin with?
+    // let length = length3d(v)
+    // let x = v.x / length
+    // let y = v.y / length
+    // let z = v.z / length
+    // v.x = x
+    // v.y = y
+    // v.z = z
 }
 
 export let dot = (a:{x:number,y:number,z:number},b:{x:number,y:number,z:number}) => {

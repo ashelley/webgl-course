@@ -65,12 +65,6 @@ class Renderer extends RendererBase {
                                         transparency: 0,
                                         emissionColor: makeFloatColor(3,3,3)
                                         }))         
-                                        
-                                        
-        this.setSize(640,480)                                        
-
-
-
     }
 
     rayTrace(start:Vector3, direction:Vector3, depth:number = 0):Color {
@@ -90,8 +84,8 @@ class Renderer extends RendererBase {
                 }
                 if(t0 < near) {
                     near = t0
+                    closestObject = o                    
                 }
-                closestObject = o
             }
         }
 

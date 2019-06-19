@@ -74,11 +74,12 @@ export default abstract class SoftwareSceneBase extends React.Component<{},{}> {
     render() {
         return (
             <div style={{position:'relative'}}>
-                <div style={{display:'flex', flexDirection:'row', position:'absolute', right: 0}}>
+                <div style={{display:'flex', flexDirection:'row', position:'absolute', right: 0, WebkitTextStroke: "1px black"}}>
                     <button onClick={this.handleLockedFpsToggle}>{this.state.frameRateLocked ? this.state.frameRateLocked: "Variable"} FPS</button>
                     <div style={{color:'white', padding: 3}}>{this.state.fps}</div>
                     <div style={{color:'white', padding: 3}}>{this.state.lastFrameTime} ms</div>
                     <div style={{color:'white', padding: 3}}>mouseX :{this.state.mouseX} mouseY: {this.state.mouseY}</div>
+                    {this.renderer && <div style={{color:'white', padding: 3}}>{this.renderer.width} x {this.renderer.height}</div>}
                 </div>
                 <canvas ref={this.canvasRef} onMouseMove={this.handleMouseMove} style={{border: '1px solid black'}} />
             </div>

@@ -153,8 +153,9 @@ class Renderer extends RendererBase {
                     normalize(lightDirection)
                     for(let j = 0; j < objects.length; j++) {
                         if(i != j) {
+                            let targetObject = objects[j]
                             let photonStart = add3d(intersectionPoint,scale3d(normal, bias))
-                            o.rayIntersect(vec3(photonStart.x,photonStart.y,photonStart.z), vec3(lightDirection.x,lightDirection.y,lightDirection.z), intersection)
+                            targetObject.rayIntersect(vec3(photonStart.x,photonStart.y,photonStart.z), vec3(lightDirection.x,lightDirection.y,lightDirection.z), intersection)
                             if(intersection.hit) {
                                 transmission = makeFloatColor(0,0,0)
                             }
@@ -165,7 +166,7 @@ class Renderer extends RendererBase {
                             surfaceColor, 
                             multiplyColor(
                                 scaleColor(
-                                    multiplyColor(surfaceColor,transmission),
+                                    multiplyColor(closestObject.surfaceColor,transmission),
                                     Math.max(0,dot(normal,lightDirection))
                                 ),o.emissionColor))
                 }
@@ -200,7 +201,7 @@ class Renderer extends RendererBase {
                 let rayStart = vec3(0,0,0)
 
                 let color = this.rayTrace(rayStart,rayDirection)
-                this.setPixelF(x,y,color)
+                this.setPixelF(x,this.height-y,color)
             }
         }
     }

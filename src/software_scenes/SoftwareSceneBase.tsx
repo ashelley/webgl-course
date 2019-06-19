@@ -53,12 +53,12 @@ export default abstract class SoftwareSceneBase extends React.Component<{},{}> i
         await this.renderer.init()
 
         this.renderLoop = new RenderLoop(this.renderer.render)
+        this.renderLoop.frameDone = this.frameDone     
         this.renderLoop.start()    
-        this.logFps()    
-    }
+    }    
 
-    logFps = () => {
-        setTimeout(this.logFps, 500)
+    frameDone = () => {
+        this.setState({})
     }
 
     handleLockedFpsToggle = e => {

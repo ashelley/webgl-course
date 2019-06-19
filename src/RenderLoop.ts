@@ -12,6 +12,10 @@ export default class RenderLoop {
         this.render = render        
     }
 
+    frameDone() {
+
+    }
+
     start() {
         this.isActive = true
         this.lastFrameStartAt = performance.now()
@@ -30,6 +34,7 @@ export default class RenderLoop {
         else {
             this.variableRate()
         }
+        this.frameDone()
     }
 
     variableRate() {

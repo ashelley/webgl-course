@@ -142,7 +142,7 @@ class Renderer extends RendererBase {
                 refraction = this.rayTrace(vec3(startRefract.x,startRefract.y,startRefract.z), vec3(refractionDir.x,refractionDir.y,refractionDir.z), depth + 1)
             }
 
-            surfaceColor = addColor(scaleColor(reflection,fresnelEffect), multiplyColor(scaleColor(refraction,(1 - fresnelEffect) * closestObject.transparency), closestObject.surfaceColor))
+            surfaceColor = multiplyColor(addColor(scaleColor(reflection,fresnelEffect), scaleColor(scaleColor(refraction,1 - fresnelEffect), closestObject.transparency)), closestObject.surfaceColor))
         }
         else {
             for(let i = 0; i < objects.length; i++) {

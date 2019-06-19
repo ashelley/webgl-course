@@ -1,6 +1,6 @@
 import Vector3 from "../helpers/Vector3";
 import { Color } from "./Color";
-import { subtract2d, subtract3d, dot, length3d, length2 } from "../helpers/math";
+import { subtract2d, subtract3d, dot, length3d, length2, sqrt } from "../helpers/math";
 
 
 export interface InterSectResult {
@@ -24,7 +24,7 @@ export class Sphere {
         this.radiusSquared = radius * radius
     }
 
-    rayIntersect(position:Vector3, direction:Vector3, result:InterSectResult) {
+    rayIntersecGeometric(position:Vector3, direction:Vector3, result:InterSectResult) {
         result.t0 = NaN
         result.t1 = NaN
         result.hit = false
@@ -44,6 +44,39 @@ export class Sphere {
         result.t0 = tca - thc
         result.t1 = tca + thc
     }
+
+    rayIntersectAnalytic(position:Vector3, direction:Vector3, result:InterSectResult) {
+        result.t0 = NaN
+        result.t1 = NaN
+        result.hit = false        
+
+        let l = subtract3d(position, this.center)
+        let a = dot(direction,direction)
+        let b = 2 * dot(direction,l)
+        let c = dot(l,l) - this.radiusSquared
+
+        this.solveQuadratic(a,b,c,result)                
+    }
+
+    solveQuadratic (a:number, b:number, c:number, result:InterSectResult)
+    { 
+        let discr = b * b - 4 * a * c; 
+        if (discr < 0) return false; 
+        result.hit = true        
+        
+        if (discr == 0) {
+            result.t0 = - 0.5 * b / a
+            result.t1 = result.t0
+        } else { 
+            let q = (b > 0) ? 
+                -0.5 * (b + sqrt(discr)) : 
+                -0.5 * (b - sqrt(discr))
+            
+            result.t0 = q / a; 
+            result.t1 = c / q; 
+        }      
+        return true; 
+    }     
 }
 
 export let createSphere = (args:{center:Vector3, radius:number,surfaceColor:Color,emissionColor?:Color,transparency:number,reflectivity:number}) => {

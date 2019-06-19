@@ -3,14 +3,49 @@ import { RendererBase } from "../software_renderer/RendererBase";
 import Matrix4 from "../helpers/Matrix4";
 import Vector3 from "../helpers/Vector3";
 import Vector2 from "../helpers/Vector2";
-import { Sphere, createSphere } from "../primatives/Sphere";
+import { Sphere, createSphere, InterSectResult } from "../primatives/Sphere";
 import { vec3 } from "../software_renderer/helpers";
 import { makeFloatColor, Color, rgbToFloatColor, Colors, makeRGBColor } from "../primatives/Color";
 import { normalize, multiply3d, scale3d, add3d, subtract3d, dot, mix, multiplyColor, scaleColor, addColor } from "../helpers/math";
+import React from 'react'
+
+type InsersectMode = 'geographic'|'analytic'
+interface RendererState {
+    intersectMode:InsersectMode
+}
 
 export default class TestRayTracer extends SoftwareSceneBase {
+
     createRenderer(canvas: HTMLCanvasElement, width: number, height: number) {
         return new Renderer(canvas, width, height)
+    }
+
+    getInitialState():RendererState {
+        return {
+            intersectMode: 'geographic'
+        }
+    }
+
+    handleToggleIntersectMode = e => {
+        e.preventDefault()
+        e.stopPropagation()
+
+        this.setState((state:RendererState) => {
+            if(state.intersectMode == 'analytic') {
+                return {intersectMode: 'geographic'}
+            }
+            return {intersectMode: 'analytic'}            
+        })
+    }
+
+    debugUI(state:{intersectMode:InsersectMode}) {
+        let renderer = this.renderer as Renderer        
+        if(renderer != null) {
+            renderer.intersectMode = state.intersectMode
+        }
+        return <>
+            <div style={{textDecoration:'underline', cursor:'pointer'}} onClick={this.handleToggleIntersectMode}>IntersectMode: {state.intersectMode}</div>
+        </>
     }
 }
 
@@ -19,7 +54,7 @@ class Renderer extends RendererBase {
     spheres:Sphere[] = []
     backgroundColor:Color = rgbToFloatColor(Colors.ELECTRIC_INDIGO)
     maxRayDepth = 5
-    
+    intersectMode:InsersectMode    
 
     async init() {
         this.spheres.push(createSphere({center: vec3(0.0,-10004,-20),
@@ -67,6 +102,15 @@ class Renderer extends RendererBase {
                                         }))         
     }
 
+    sphereRayIntersection(sphere:Sphere, position:Vector3, direction:Vector3, result:InterSectResult) {
+        if(this.intersectMode == 'analytic' ) {
+            sphere.rayIntersectAnalytic(position,direction,result)
+        }
+        else {
+            sphere.rayIntersecGeometric(position,direction,result)
+        }        
+    }
+
     rayTrace(start:Vector3, direction:Vector3, depth:number = 0):Color {
         let near = Infinity
         let objects = this.spheres
@@ -76,10 +120,13 @@ class Renderer extends RendererBase {
         
         for(let i = 0; i < objects.length; i++) {
             let o = objects[i]
-            o.rayIntersect(start,direction,intersection)
+            this.sphereRayIntersection(o, start,direction,intersection)
             if(intersection.hit) {                
                 let t0 = intersection.t0
                 if (t0 < 0) {
+                    t0 = intersection.t1
+                }
+                if(t0 < 0) {
                     t0 = intersection.t1
                 }
                 if(t0 < near) {
@@ -136,7 +183,7 @@ class Renderer extends RendererBase {
                 refraction = this.rayTrace(vec3(startRefract.x,startRefract.y,startRefract.z), vec3(refractionDir.x,refractionDir.y,refractionDir.z), depth + 1)
             }
 
-            surfaceColor = multiplyColor(addColor(scaleColor(reflection,fresnelEffect), scaleColor(scaleColor(refraction,1 - fresnelEffect), closestObject.transparency)), closestObject.surfaceColor))
+            surfaceColor = multiplyColor(addColor(scaleColor(reflection,fresnelEffect), scaleColor(scaleColor(refraction,1 - fresnelEffect), closestObject.transparency)), closestObject.surfaceColor)
         }
         else {
             for(let i = 0; i < objects.length; i++) {
@@ -149,7 +196,7 @@ class Renderer extends RendererBase {
                         if(i != j) {
                             let targetObject = objects[j]
                             let photonStart = add3d(intersectionPoint,scale3d(normal, bias))
-                            targetObject.rayIntersect(vec3(photonStart.x,photonStart.y,photonStart.z), vec3(lightDirection.x,lightDirection.y,lightDirection.z), intersection)
+                            this.sphereRayIntersection(targetObject, vec3(photonStart.x,photonStart.y,photonStart.z), vec3(lightDirection.x,lightDirection.y,lightDirection.z), intersection)
                             if(intersection.hit) {
                                 transmission = makeFloatColor(0,0,0)
                             }

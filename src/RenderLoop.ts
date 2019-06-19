@@ -5,6 +5,7 @@ export default class RenderLoop {
     isActive = false
     lastFrameMS = 0
     lastFrameStartAt = 0
+    renderTime = 0
     render:(dt:number)=>void
 
     constructor(render:(dt:number)=>void) {
@@ -40,7 +41,9 @@ export default class RenderLoop {
         this.fps = Math.floor(1.0/deltaT)
         this.lastFrameMS = deltaMs
 
+        let startRenderAt = performance.now()
         this.render(deltaT)
+        this.renderTime = performance.now() - startRenderAt
 
         if(this.isActive) {
             window.requestAnimationFrame(this.run)

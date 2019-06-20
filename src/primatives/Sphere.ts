@@ -80,7 +80,7 @@ export class Sphere {
         if(result.t0 > result.t1) {
             let t0 = result.t0
             result.t0 = result.t1
-            result.t1 = result.t0
+            result.t1 = t0
         }
     }     
 }

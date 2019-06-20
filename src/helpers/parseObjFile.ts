@@ -38,7 +38,7 @@ export class Obj {
     getVertex(vertIndex:number) {
         let xIndex = vertIndex * 3
 
-        if(xIndex < 0 || xIndex + 2 >= this.verts.length) {
+        if(xIndex < 0 || xIndex >= this.verts.length) {
             throw new Error("Invalid Vertex Index")
         }
 
@@ -277,6 +277,8 @@ class ObjParser {
         this.chompLine()
     }    
 
+    faceCount = 0
+
     parseFace() {
         let token = this.token()
         if(token.tokenType !== ObjTokenType.STRING) {
@@ -284,15 +286,25 @@ class ObjParser {
         }        
         if(token.value !== "f") {
             this.unexpectedToken("Expected Face")
-        }           
+        }        
 
         //TODO: support quads
-        for(let i = 0; i < 3; i++) {
-            let vertexIndex = this.parseIndex()
-            this.skipSlash()
-            
-            let uvIndex:number
+        let face = new ObjFace()                       
+        for(let i = 0; i < 3; i++) {     
+            this.currentObject.faces.push(face)                        
+            let vertexIndex = this.parseIndex()            
+            let vert = this.currentObject.getVertex(vertexIndex - 1)            
+            face.addVertex(vert.x, vert.y, vert.z)        
+
             let next = this.peek()
+
+            if(next.tokenType != ObjTokenType.PUNCTUATION || next.value != "/") continue
+
+            let uvIndex:number    
+            let normalIndex:number        
+
+            this.skipSlash()        
+            next = this.peek()            
             //NOTE: when we have no uv's defined in the obj file we end u with a face like f 1//1 (blank uv index)
             if(next.tokenType == ObjTokenType.PUNCTUATION && next.value == "/") {
                 uvIndex -1
@@ -301,9 +313,7 @@ class ObjParser {
             }
             this.skipSlash()
             
-            let normalIndex = this.parseIndex()
-
-            let vert = this.currentObject.getVertex(vertexIndex - 1)
+            normalIndex = this.parseIndex()
             
             let uv:{u:number,v:number}
             if(!this.disableParseUv && uvIndex >= 0) {
@@ -318,13 +328,10 @@ class ObjParser {
                 normal = this.currentObject.getNormal(normalIndex - 1)
             } else {
                 normal = {x: 0, y: 1, z: 0}
-            }                
-            
-            let face = new ObjFace()                    
-            face.addVertex(vert.x, vert.y, vert.z)
+            }          
+
             face.addUV(uv.u, uv.v)
             face.addNormal(normal.x, normal.y, normal.z)
-            this.currentObject.faces.push(face)            
         }
 
         this.chompLine()
@@ -365,18 +372,22 @@ class ObjParser {
     }    
 
     chompLine() {
+        let endFound = false
         for(;;) {
             let next = this.peek()
             if(next.tokenType == ObjTokenType.EOF) {
-                break;
+                return                
             }
             else if(next.tokenType == ObjTokenType.EOL) {
-                next = this.next()
-                if(this.peek().tokenType !== ObjTokenType.EOL) {
-                    break;
-                }
+                endFound = true
+                this.next()
             }                
-            this.next()
+            else if(endFound) {
+                return
+            }
+            else {
+                this.next()
+            }
         }
     }
 }

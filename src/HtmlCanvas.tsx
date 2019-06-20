@@ -8,6 +8,7 @@ import TestZBuffer from "./software_scenes/TestZBuffer";
 import TestProjection from "./software_scenes/TestProjection";
 import TestMaxtrixTransform from "./software_scenes/TestMatrixTransform";
 import TestRayTracer from "./software_scenes/TestRayTracer";
+import TestXTree from "./software_scenes/TestXTree";
 
 export default class HtmlCanvas extends React.Component<{},{}> {
 
@@ -22,7 +23,8 @@ export default class HtmlCanvas extends React.Component<{},{}> {
             // <TestZBuffer />
             //<TestProjection />   //TODO: not complete
             //<TestMaxtrixTransform />
-            <TestRayTracer />
+            //<TestRayTracer />
+            <TestXTree />
         )
     }
 }

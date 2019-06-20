@@ -1,16 +1,10 @@
 import SoftwareSceneBase from "./SoftwareSceneBase";
 import { RendererBase } from "../software_renderer/RendererBase";
-import { vec2, vec3, vec3i} from "../software_renderer/helpers";
 import { loadTextFile } from "../helpers/loadFile";
 import parseObjFile, { Obj } from "../helpers/parseObjFile";
-import scaleNumberIntoRange from "../helpers/scaleNumberIntoRange";
-import PseudoRandom from "../helpers/PseudoRandom";
-import { calculateSurfaceNormal } from "../helpers/calculateSurfaceNormal";
-import { normalize, multiply2d, multiply3d, dot, subtract3d, cross, mat4x4 } from "../helpers/math";
+import { mat4x4 } from "../helpers/math";
 import Matrix4 from "../helpers/Matrix4";
-import Vector3 from "../helpers/Vector3";
-import Vector2 from "../helpers/Vector2";
-import { makeRGBColor, Colors, Color } from "../primatives/Color";
+import { Colors } from "../primatives/Color";
 
 export default class TestXTree extends SoftwareSceneBase {
     createRenderer(canvas: HTMLCanvasElement, width: number, height: number) {

@@ -25,6 +25,9 @@ export default abstract class SoftwareSceneBase extends React.Component<{},{}> i
                 this.startScene()
             })
         }
+        else {
+            this.startScene()
+        }
     }    
 
     getInitialState() {

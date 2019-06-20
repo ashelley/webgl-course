@@ -1,14 +1,12 @@
 import SoftwareSceneBase from "./SoftwareSceneBase";
 import { RendererBase } from "../software_renderer/RendererBase";
-import { Colors, makeColor, vec2, vec3, vec3i } from "../software_renderer/helpers";
+import { vec3, vec3i } from "../software_renderer/helpers";
 import { loadTextFile } from "../helpers/loadFile";
 import parseObjFile, { Obj } from "../helpers/parseObjFile";
-import scaleNumberIntoRange from "../helpers/scaleNumberIntoRange";
-import PseudoRandom from "../helpers/PseudoRandom";
 import { calculateSurfaceNormal } from "../helpers/calculateSurfaceNormal";
-import { normalize, multiply2d, multiply3d, dot } from "../helpers/math";
+import { normalize, dot } from "../helpers/math";
 import Matrix4 from "../helpers/Matrix4";
-import Vector3 from "../helpers/Vector3";
+import { makeRGBColor, Colors } from "../primatives/Color";
 
 export default class TestProjection extends SoftwareSceneBase {
     createRenderer(canvas: HTMLCanvasElement, width: number, height: number) {
@@ -112,7 +110,7 @@ class Renderer extends RendererBase {
             intensity *= 2
 
             if (intensity > 0) {
-                let color = makeColor(255 * intensity, 255 * intensity, 255 * intensity)
+                let color = makeRGBColor(255 * intensity, 255 * intensity, 255 * intensity)
                 let t0 = vec3i(x0, y0, z0)
                 let t1 = vec3i(x1, y1, z1)
                 let t2 = vec3i(x2, y2, z2)

@@ -1,10 +1,11 @@
-import { int, makePoint, Color, abs, swapPointXY, Colors, sortPointByY, sortPointByX, Point } from "./helpers";
+import { makePoint, swapPointXY, sortPointByY, sortPointByX, Point } from "./helpers";
 import Vector2 from "../helpers/Vector2";
-import { add2d, multiply2d, subtract2d, multiply2dToScalar as multiply2dByScalar, barycentric } from "../helpers/math";
+import { add2d, multiply2d, subtract2d, multiply2dToScalar as multiply2dByScalar, barycentric, int, abs } from "../helpers/math";
 import { boundingBox } from "../helpers/boundingBox";
 import { pointInTriangle } from "../helpers/pointInTriangle";
 import Vector3 from "../helpers/Vector3";
 import Matrix4 from "../helpers/Matrix4";
+import { Colors, Color } from "../primatives/Color";
 
 export abstract class RendererBase {
 

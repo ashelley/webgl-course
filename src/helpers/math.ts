@@ -117,3 +117,47 @@ export let barycentric = (p:{x:number,y:number,z:number}, triangle:[{x:number,y:
 export let mix = (a:number, b:number, mix:number) => {
     return b * mix + a * (1 - mix); 
 } 
+
+export let mat4x4 = (a:number,b:number,c:number,d:number,e:number,f:number,g:number,h:number,i:number,j:number,k:number,l:number,m:number,n:number,o:number,p:number) => {
+    let M = new Float32Array(16)
+
+    //[ 0, 1, 2, 3]
+    //[ 4, 5, 6, 7]
+    //[ 8, 9,10,11]
+    //[12,13,14,15]
+
+    // M[0] = a
+    // M[4] = b
+    // M[8] = c
+    // M[12] = d
+    // M[1] = e
+    // M[5] = f
+    // M[9] = g
+    // M[13] = h
+    // M[2] = i
+    // M[6] = j
+    // M[10] = k
+    // M[14] = l
+    // M[3] = m
+    // M[7] = n
+    // M[11] = o
+    // M[15] = p
+
+    M[0] = a
+    M[1] = b
+    M[2] = c
+    M[3] = d
+    M[4] = e
+    M[5] = f
+    M[6] = g
+    M[7] = h
+    M[8] = i
+    M[9] = j
+    M[10] = k
+    M[11] = l
+    M[12] = m
+    M[13] = n
+    M[14] = o
+    M[15] = p    
+    return M
+}

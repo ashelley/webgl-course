@@ -109,6 +109,21 @@ class Renderer extends RendererBase {
         else {
             sphere.rayIntersecGeometric(position,direction,result)
         }        
+        if(!result.hit) {
+            return
+        }
+        if(result.t0 > result.t1) {
+            let t0 = result.t0
+            result.t0 = result.t1
+            result.t1 = t0
+        }
+        if (result.t0 < 0) {
+            result.t0 = result.t1
+            if(result.t0 < 0) {
+                result.hit = false
+                return
+            }
+        }
     }
 
     rayTrace(start:Vector3, direction:Vector3, depth:number = 0):Color {
@@ -121,16 +136,9 @@ class Renderer extends RendererBase {
         for(let i = 0; i < objects.length; i++) {
             let o = objects[i]
             this.sphereRayIntersection(o, start,direction,intersection)
-            if(intersection.hit) {                
-                let t0 = intersection.t0
-                if (t0 < 0) {
-                    t0 = intersection.t1
-                }
-                if(t0 < 0) {
-                    t0 = intersection.t1
-                }
-                if(t0 < near) {
-                    near = t0
+            if(intersection.hit) {      
+                if(intersection.t0 < near) {
+                    near = intersection.t0
                     closestObject = o                    
                 }
             }

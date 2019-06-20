@@ -61,7 +61,8 @@ export class Sphere {
     solveQuadratic (a:number, b:number, c:number, result:InterSectResult)
     { 
         let discr = b * b - 4 * a * c; 
-        if (discr < 0) return false; 
+        if (discr < 0) return; 
+        
         result.hit = true        
         
         if (discr == 0) {
@@ -75,7 +76,12 @@ export class Sphere {
             result.t0 = q / a; 
             result.t1 = c / q; 
         }      
-        return true; 
+
+        if(result.t0 > result.t1) {
+            let t0 = result.t0
+            result.t0 = result.t1
+            result.t1 = result.t0
+        }
     }     
 }
 

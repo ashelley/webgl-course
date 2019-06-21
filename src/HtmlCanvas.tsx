@@ -11,6 +11,7 @@ import TestRayTracer from "./software_scenes/TestRayTracer";
 import TestXTree from "./software_scenes/TestXTree";
 import TestPinHole from "./software_scenes/TestPinHole";
 import TriangleRasterizationScratch from "./software_scenes/TriangleRasterizationScratch";
+import PerspectiveRasterizationScratchZBuffer from "./software_scenes/PerspectiveRasterizationScratchZBuffer";
 
 export default class HtmlCanvas extends React.Component<{},{}> {
 
@@ -28,7 +29,8 @@ export default class HtmlCanvas extends React.Component<{},{}> {
             //<TestRayTracer />
             //<TestXTree />
             //<TestPinHole />
-            <TriangleRasterizationScratch />
+            //<TriangleRasterizationScratch />
+            <PerspectiveRasterizationScratchZBuffer />
         )
     }
 }

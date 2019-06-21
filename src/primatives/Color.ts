@@ -25,6 +25,10 @@ export let rgbToFloatColor = ({r,g,b,a}:Color) => {
     return {r: r/255, g: g/255, b: b/255, a: a/255}    
 }
 
+export let floatToRGBColor = ({r,g,b,a}:Color) => {
+    return {r: r*255, g: g*255, b: b*255, a: a*255}    
+}
+
 export let Colors = {
     WHITE: makeRGBColor(255,255,255),
     RED: makeRGBColor(255,0,0),

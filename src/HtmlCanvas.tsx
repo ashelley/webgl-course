@@ -10,6 +10,7 @@ import TestMaxtrixTransform from "./software_scenes/TestMatrixTransform";
 import TestRayTracer from "./software_scenes/TestRayTracer";
 import TestXTree from "./software_scenes/TestXTree";
 import TestPinHole from "./software_scenes/TestPinHole";
+import TriangleRasterizationScratch from "./software_scenes/TriangleRasterizationScratch";
 
 export default class HtmlCanvas extends React.Component<{},{}> {
 
@@ -26,7 +27,8 @@ export default class HtmlCanvas extends React.Component<{},{}> {
             //<TestMaxtrixTransform />
             //<TestRayTracer />
             //<TestXTree />
-            <TestPinHole />
+            //<TestPinHole />
+            <TriangleRasterizationScratch />
         )
     }
 }

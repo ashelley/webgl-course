@@ -93,6 +93,10 @@ export let cross = (a:{x:number,y:number,z:number}, b:{x:number,y:number,z:numbe
     return {x,y,z}
 }
 
+export let edgeFunction = (a:{x:number,y:number}, b:{x:number,y:number},c:{x:number,y:number}) => {
+    return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x)
+}
+
 export let barycentric = (p:{x:number,y:number,z:number}, triangle:[{x:number,y:number,z:number},{x:number,y:number,z:number},{x:number,y:number,z:number}]) => {
     //https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
     let v0 = subtract3d(triangle[1],triangle[0])

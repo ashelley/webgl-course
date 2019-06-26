@@ -37,6 +37,10 @@ export let vec3 = (x:number,y:number,z:number) => {
     return new Vector3(x,y,z)
 }
 
+export let vec4 = (x:number,y:number,z:number,w:number) => {
+    return {x,y,z,w}
+}
+
 export let vec3i = (x:number,y:number,z:number) => {
     return new Vector3(Math.floor(x),Math.floor(y),Math.floor(z))
 }

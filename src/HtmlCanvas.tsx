@@ -12,6 +12,7 @@ import TestXTree from "./software_scenes/TestXTree";
 import TestPinHole from "./software_scenes/TestPinHole";
 import TriangleRasterizationScratch from "./software_scenes/TriangleRasterizationScratch";
 import PerspectiveRasterizationScratchZBuffer from "./software_scenes/PerspectiveRasterizationScratchZBuffer";
+import GURU7_1 from "./software_scenes/GURU7_1";
 
 export default class HtmlCanvas extends React.Component<{},{}> {
 
@@ -30,7 +31,8 @@ export default class HtmlCanvas extends React.Component<{},{}> {
             //<TestXTree />
             //<TestPinHole />
             //<TriangleRasterizationScratch />
-            <PerspectiveRasterizationScratchZBuffer />
+            //<PerspectiveRasterizationScratchZBuffer />
+            <GURU7_1 />
         )
     }
 }

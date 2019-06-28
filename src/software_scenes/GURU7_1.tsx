@@ -6,6 +6,7 @@ import { mat4x4, edgeFunction, add3d } from "../helpers/math";
 import Matrix4 from "../helpers/Matrix4";
 import { Colors, makeFloatColor, floatToRGBColor } from "../primatives/Color";
 import { vec2, vec4, vec3 } from "../software_renderer/helpers";
+import { initializeEulerCamera, IEulerCamera } from "../primatives/Camera";
 
 export default class GURU7_1 extends SoftwareSceneBase {
     createRenderer(canvas: HTMLCanvasElement, width: number, height: number) {
@@ -17,8 +18,20 @@ class Renderer extends RendererBase {
 
     angleY:number = 0
 
+    camera:IEulerCamera
+
     async init() {
         this.setSize(400,400)
+
+        this.camera = initializeEulerCamera({
+            viewportWidth: this.width, 
+            viewportHeight: this.height,
+            pos: vec4(0,0,-100,1),
+            dir: vec4(0,0,0,1),
+            target: vec4(0,0,0,0),
+            nearClipZ: 50,
+            farClipZ: 500
+        })        
     }
 
     doRenderWork() {
@@ -32,45 +45,12 @@ class Renderer extends RendererBase {
         let vertices:{x:number,y:number,z:number,w:number}[] = []
         vertices.push(v0,v1,v2)
 
-
-        let campos = vec4(0,0,-100,1)
-        let camdir = vec4(0,0,0,1)
-        let cam_u = vec4(1,0,0,1) //+x 
-        let cam_v = vec4(0,1,0,1) //+y
-        let cam_n = vec4(0,0,1,1) //+z
-        let camtarget = vec4(0,0,0,0)
-
-        let nearclip = 50
-        let farclip = 500
+        let cam = this.camera        
 
         let mcam = Matrix4.identity()
         let mper = Matrix4.identity()
         let mscr = Matrix4.identity()
 
-        let fov = 90
-        let aspectRatio = this.width/this.height
-
-        let viewplaneWidth = 2
-        let viewplaneHeight = 2 / aspectRatio
-
-        let tan_fov_div2 = Math.tan(fov/2*Math.PI/180)
-
-        let cameraViewDistance = 0.5 * viewplaneWidth * tan_fov_div2
-
-        let rightClippingPlane:{x:number,y:number,z:number}        
-        let leftClippingPlane:{x:number,y:number,z:number}
-        let topClippingPlane:{x:number,y:number,z:number}
-        let bottomClippingPlane:{x:number,y:number,z:number}
-
-        if(fov == 90) {
-            rightClippingPlane = vec3(1,0,-1) //x=z
-            leftClippingPlane = vec3(-1,0,-1) //-x=z
-            topClippingPlane = vec3(0,1,-1) //y=z
-            bottomClippingPlane = vec3(0,-1,-1) //-y=z            
-        }
-        else {
-
-        }
 
         let mrot = Matrix4.identity()
 
@@ -113,7 +93,7 @@ class Renderer extends RendererBase {
         let matInverse = mat4x4( 1,        0,        0,        0,
                                  0,        1,        0,        0,
                                  0,        0,        1,        0,
-                                 -campos.x,-campos.y,-campos.z,1 )
+                                 -cam.pos.x,-cam.pos.y,-cam.pos.z,1 )
 
         let matInvX:Float32Array // inverse camera x axis rotation matrix            
         let matInvY:Float32Array // inverse camera y axis rotation matrix         
@@ -124,9 +104,9 @@ class Renderer extends RendererBase {
         // plugging negative values into each of the rotations will result
         // in an inverse matrix        
 
-        let thetaX = camdir.x
-        let thetaY = camdir.y
-        let thetaZ = camdir.z
+        let thetaX = cam.dir.x
+        let thetaY = cam.dir.y
+        let thetaZ = cam.dir.z
 
         // compute the sine and cosine of the angle x        
         {
@@ -188,8 +168,8 @@ class Renderer extends RendererBase {
 
             let z = v.z
 
-            v.x = cameraViewDistance * (v.x/z)
-            v.y = cameraViewDistance * (v.y/z)
+            v.x = cam.viewDistance * (v.x/z)
+            v.y = cam.viewDistance * (v.y/z)
         }                   
 
         //PERSPECTIVE TO SCREEN

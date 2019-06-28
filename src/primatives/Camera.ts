@@ -1,6 +1,7 @@
 import GLInstance from "../GLInstance";
 import Transform, { deg2Rad } from "./Transform";
 import Matrix4 from "../helpers/Matrix4";
+import { vec4, vec3 } from "../software_renderer/helpers";
 
 export enum CameraMode {    
     MODE_FREE = 0,
@@ -78,5 +79,88 @@ export default class Camera {
 		//Cameras work by doing the inverse transformation on all meshes, the camera itself is a lie :)
 		Matrix4.invert(this.viewMatrix,this.transform.viewMatrix.raw);
 		return this.viewMatrix;
+	}
+}
+
+export interface IEulerCamera {
+	pos: {x:number,y:number,z:number,w:number}
+	dir: {x:number,y:number,z:number,w:number}
+	target: {x:number,y:number,z:number,w:number}
+
+	u: {x:number,y:number,z:number,w:number}
+	v: {x:number,y:number,z:number,w:number}
+	n: {x:number,y:number,z:number,w:number}
+
+	nearClipZ: number
+	farClipZ: number
+
+	fov: number
+	aspectRatio: number
+	viewDistance: number
+}
+
+interface IEulerCameraInit {
+	pos: {x:number,y:number,z:number,w:number}
+	dir: {x:number,y:number,z:number,w:number}
+	target: {x:number,y:number,z:number,w:number}	
+	viewportWidth:number
+	viewportHeight:number
+	nearClipZ:number
+	farClipZ:number
+}
+
+export let initializeEulerCamera = (args:IEulerCameraInit):IEulerCamera => {
+	let campos = args.pos
+	let camdir = args.dir
+	let camtarget = args.target
+
+	let cam_u = vec4(1,0,0,1) //+x 
+	let cam_v = vec4(0,1,0,1) //+y
+	let cam_n = vec4(0,0,1,1) //+z
+
+
+	let nearclip = args.nearClipZ
+	let farclip = args.farClipZ
+
+	let fov = 90
+	let aspectRatio = args.viewportWidth/args.viewportHeight
+
+	let viewplaneWidth = 2
+	let viewplaneHeight = 2 / aspectRatio
+
+	let tan_fov_div2 = Math.tan(fov/2*Math.PI/180)
+
+	let cameraViewDistance = 0.5 * viewplaneWidth * tan_fov_div2
+
+	let rightClippingPlane:{x:number,y:number,z:number}        
+	let leftClippingPlane:{x:number,y:number,z:number}
+	let topClippingPlane:{x:number,y:number,z:number}
+	let bottomClippingPlane:{x:number,y:number,z:number}
+
+	if(fov == 90) {
+		rightClippingPlane = vec3(1,0,-1) //x=z
+		leftClippingPlane = vec3(-1,0,-1) //-x=z
+		topClippingPlane = vec3(0,1,-1) //y=z
+		bottomClippingPlane = vec3(0,-1,-1) //-y=z            
+	}
+	else {
+
+	}
+
+	return {
+		pos: campos,
+		dir: camdir,
+		target: camtarget,
+
+		fov: fov,
+		aspectRatio: aspectRatio,
+		viewDistance: cameraViewDistance,
+	
+		u: cam_u,
+		v: cam_v,
+		n: cam_n,
+	
+		nearClipZ: nearclip,
+		farClipZ: farclip
 	}
 }

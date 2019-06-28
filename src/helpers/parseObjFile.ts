@@ -1,5 +1,11 @@
+import { TokenStream, TokenType } from "../parsers/TokenStream";
+import { ParserBase } from "../parsers/ParserBase";
+
+
 let parseObjFile = (source:string, options:{flipYUV?:boolean,disableParseNormals?:boolean,disableParseUvs?:boolean} = {}) => {
-    let parser = new ObjParser(source)
+    let tokenStream = new ObjTokenStream();
+    tokenStream.tokenize(source)
+    let parser = new ObjParser(tokenStream.tokens)
     parser.flipYUV = !!options.flipYUV
     parser.disableParseUv = !!options.disableParseUvs
     parser.disableParseNormals = !!options.disableParseNormals
@@ -13,17 +19,13 @@ let parseObjFile = (source:string, options:{flipYUV?:boolean,disableParseNormals
     return obj0
 }
 
-enum ObjTokenType {
-    EOL = "EOL",
-    EOF = "EOF",
-    NUMBER = "NUMBER",
-    STRING = "STRING",
-    PUNCTUATION = "PUNC",
-}
-
-interface ObjFileToken {
-    value?:string
-    tokenType: ObjTokenType
+class ObjTokenStream extends TokenStream {    
+    isEndOfString(ch: string) {
+        return this.isWhiteSpace(ch)
+    }
+    isPunctuation(ch: string) {
+        return ch == '/'
+    }
 }
 
 export class Obj {
@@ -104,9 +106,7 @@ class ObjFace {
     }       
 }
 
-class ObjParser {
-    index: number = -1
-    tokens:ObjFileToken[]    
+class ObjParser extends ParserBase {
     objects:Obj[] = []
     currentObject:Obj
     flipYUV:boolean
@@ -114,43 +114,14 @@ class ObjParser {
     disableParseUv = false
     disableParseNormals = false
 
-    constructor(source:string) {
-        let tokenizer = new TokenStream()
-        tokenizer.tokenize(source)
-        this.tokens = tokenizer.tokens
-    }
-
-    peek() {
-        if(this.index >= this.tokens.length) {
-            return {tokenType: ObjTokenType.EOF}
-        }
-        else {
-            return this.tokens[this.index+1]
-        }
-    }
-
-    next() {        
-        this.index++
-        if(this.index < this.tokens.length) {
-            return this.tokens[this.index]
-        }
-        else {
-            return {tokenType: ObjTokenType.EOF}
-        }
-    }
-
-    token() {
-        return this.tokens[this.index]
-    }
-
     parse() {
         let token = this.next()
         let i = 0
         while(true) {
-            if(token.tokenType == ObjTokenType.EOF) {
+            if(token.tokenType == TokenType.EOF) {
                 break;
             }
-            else if(token.tokenType == ObjTokenType.STRING) {
+            else if(token.tokenType == TokenType.STRING) {
                 this.parseCommand()
             }
             else {
@@ -161,18 +132,9 @@ class ObjParser {
         }    
     }
 
-    unexpectedToken(reason?:string) {
-        let token = this.token()
-        let errMessage = "Unexpected Token: '" + token.value + "' Type: " + token.tokenType
-        if(reason != null) {
-            errMessage += " Reason: " + reason
-        }
-        throw new Error(errMessage)
-    }
-
     parseCommand() {
         let token = this.token()
-        if(token.tokenType !== ObjTokenType.STRING) {
+        if(token.tokenType !== TokenType.STRING) {
             throw new Error("Expected String Literal For Command Token: " + token.tokenType)
         }
         if(token.value == "o") {            
@@ -201,14 +163,14 @@ class ObjParser {
 
     parseObject() {
         let token = this.token()
-        if(token.tokenType !== ObjTokenType.STRING) {
+        if(token.tokenType !== TokenType.STRING) {
             this.unexpectedToken("Expected Command")
         }        
         if(token.value !== "o") {
             this.unexpectedToken("Expected Object")
         }
         token = this.next()
-        if(token.tokenType != ObjTokenType.STRING) {
+        if(token.tokenType != TokenType.STRING) {
             this.unexpectedToken("Expected String")
         }
         this.currentObject = new Obj()
@@ -219,7 +181,7 @@ class ObjParser {
 
     parseVertex() {
         let token = this.token()
-        if(token.tokenType !== ObjTokenType.STRING) {
+        if(token.tokenType !== TokenType.STRING) {
             this.unexpectedToken("Expected Command")
         }        
         if(token.value !== "v") {
@@ -238,7 +200,7 @@ class ObjParser {
     parseUV() {
         if(!this.disableParseUv) {
             let token = this.token()
-            if(token.tokenType !== ObjTokenType.STRING) {
+            if(token.tokenType !== TokenType.STRING) {
                 this.unexpectedToken("Expected Command")
             }        
             if(token.value !== "vt") {
@@ -260,7 +222,7 @@ class ObjParser {
     parseNormal() {
         if(!this.disableParseUv) {
             let token = this.token()
-            if(token.tokenType !== ObjTokenType.STRING) {
+            if(token.tokenType !== TokenType.STRING) {
                 this.unexpectedToken("Expected Command")
             }        
             if(token.value !== "vn") {
@@ -281,7 +243,7 @@ class ObjParser {
 
     parseFace() {
         let token = this.token()
-        if(token.tokenType !== ObjTokenType.STRING) {
+        if(token.tokenType !== TokenType.STRING) {
             this.unexpectedToken("Expected Command")
         }        
         if(token.value !== "f") {
@@ -298,7 +260,7 @@ class ObjParser {
 
             let next = this.peek()
 
-            if(next.tokenType != ObjTokenType.PUNCTUATION || next.value != "/") continue
+            if(next.tokenType != TokenType.PUNCTUATION || next.value != "/") continue
 
             let uvIndex:number    
             let normalIndex:number        
@@ -306,7 +268,7 @@ class ObjParser {
             this.skipSlash()        
             next = this.peek()            
             //NOTE: when we have no uv's defined in the obj file we end u with a face like f 1//1 (blank uv index)
-            if(next.tokenType == ObjTokenType.PUNCTUATION && next.value == "/") {
+            if(next.tokenType == TokenType.PUNCTUATION && next.value == "/") {
                 uvIndex -1
             } else {
                 uvIndex = this.parseIndex()
@@ -339,26 +301,14 @@ class ObjParser {
 
     skipSlash() {
         let token = this.next()
-        if(token.tokenType != ObjTokenType.PUNCTUATION || token.value != "/") {
+        if(token.tokenType != TokenType.PUNCTUATION || token.value != "/") {
             this.unexpectedToken("Expected /")
         }
     }
 
-    parseReal() {
-        let token = this.next()
-        if(token.tokenType != ObjTokenType.NUMBER) {
-            this.unexpectedToken("Expected Number");
-        }
-        let value = parseFloat(token.value)
-        if(isNaN(value)) {
-            this.unexpectedToken("Token Value NaN")
-        }
-        return value
-    }
-
     parseIndex() {
         let token = this.next()
-        if(token.tokenType != ObjTokenType.NUMBER) {
+        if(token.tokenType != TokenType.NUMBER) {
             this.unexpectedToken("Expected Number");
         }
         let value = parseFloat(token.value)
@@ -370,123 +320,6 @@ class ObjParser {
         }
         return Math.floor(value)
     }    
-
-    chompLine() {
-        let endFound = false
-        for(;;) {
-            let next = this.peek()
-            if(next.tokenType == ObjTokenType.EOF) {
-                return                
-            }
-            else if(next.tokenType == ObjTokenType.EOL) {
-                endFound = true
-                this.next()
-            }                
-            else if(endFound) {
-                return
-            }
-            else {
-                this.next()
-            }
-        }
-    }
-}
-
-class TokenStream {
-    tokens:ObjFileToken[]
-
-    tokenize(source:string) {
-        this.tokens = []
-        let length = source.length
-        for(let i = 0; i < length;) {
-            let ch = source[i]
-            if(ch == "\r") {
-                if(i < length - 1) {
-                    ch = source[++i]
-                }
-            }
-            if(ch == "\n") {
-                this.tokens.push({
-                    tokenType: ObjTokenType.EOL
-                })                
-                i++
-                continue;
-            }
-            let isNumber = false
-            if(ch == "-") {
-                if(i < length - 1) {
-                    let next = source[i+1]
-                    if(next >= "0" && next <= "9") {
-                        isNumber = true
-                    }
-                }
-            } else if(ch >= "0" && ch <= "9") {
-                isNumber = true
-            }
-            if(isNumber) {
-                let value = ""
-                let hasDecimal = false
-                do {                    
-                    value += ch
-                    if(ch == ".") {
-                        hasDecimal = true
-                    }                    
-                    i++
-                    if(i < length) {
-                        ch = source[i]
-                    }
-
-                    if(ch == 'e') {
-                        let next = source[i+1]
-                        if(next == '-') {
-                            let exp = source[i+2]
-                            if(exp >= "0" && exp <= "9") {
-                                value += ch + next
-                                i+=2
-                                ch = exp
-                            }
-                        }
-                    }                    
-
-                } while(
-                       i < length
-                    && 
-                    (
-                        (ch >= "0" && ch <= "9")
-                        || (!hasDecimal && ch == ".")
-                    )                                       
-                )
-                this.tokens.push({
-                    tokenType: ObjTokenType.NUMBER,
-                    value
-                })                
-            }            
-            else if(ch == " " || ch == "\t") {
-                i++
-            }
-            else if(ch == "/") {
-                this.tokens.push({tokenType: ObjTokenType.PUNCTUATION, value: ch})
-                i++
-            }
-            else {
-                let value = ""
-                while(i < length && ch != " " && ch != "\t" && ch != "\r" && ch != "\n") {
-                    value += ch
-                    i++
-                    if(i < length) {
-                        ch = source[i]
-                    }                    
-                }      
-                this.tokens.push({
-                    tokenType: ObjTokenType.STRING,
-                    value
-                })                           
-            }
-        }
-        this.tokens.push({
-            tokenType: ObjTokenType.EOF
-        })
-    }
 }
 
 export default parseObjFile

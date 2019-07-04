@@ -231,3 +231,22 @@ export let buildCameraMatrixEuler = (cam:IEulerCamera) => {
 
 	return matCam
 }
+
+export let cameraToPerspective = (vertices:{x:number,y:number,z:number,w:number}[], cam:IEulerCamera) => {
+	for(let i = 0; i < vertices.length; i++) {
+		let vertex = vertices[i]
+		vertex.x = cam.viewDistance * vertex.x / vertex.z
+		vertex.y = cam.viewDistance * vertex.y / vertex.z
+	}
+}
+
+export let perspectiveToScreen = (vertices:{x:number,y:number,z:number,w:number}[], viewportWidth:number,viewportHeight:number) => {
+	let alpha = 0.5 * viewportWidth - 0.5
+	let beta = 0.5 * viewportHeight - 0.5
+
+	for(let i = 0; i < vertices.length; i++) {
+		let vertex = vertices[i]
+		vertex.x = alpha + alpha * vertex.x
+		vertex.y = beta - beta * vertex.y
+	}
+}

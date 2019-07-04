@@ -277,3 +277,36 @@ export let buildRotationMatrixEuler = (thetaX:number, thetaY:number,thetaZ:numbe
 
     return mrot;
 }
+
+export interface IRenderable {
+    vertices: {x:number,y:number,z:number,w:number}[]    
+}
+
+export interface IRenderList {
+    vertices:{x:number,y:number,z:number,w:number}[]
+    transformedVertices:{x:number,y:number,z:number,w:number}[]
+}
+
+
+export let applyTransformationMatrix = (vertices:{x:number,y:number,z:number,w:number}[], outputVertices:{x:number,y:number,z:number,w:number}[], mTransform:Float32Array) => {
+    for(let i = 0; i < vertices.length; i++) {
+        let vertex = vertices[i]
+        let [x,y,z,w] = Matrix4.multiplyVector(mTransform, [vertex.x,vertex.y,vertex.z,vertex.w])
+        let output = outputVertices[i]        
+        output.x = x
+        output.y = y
+        output.z = z
+        output.w = w
+    }
+}
+
+export let applyTranslation = (vertices:{x:number,y:number,z:number,w:number}[], outputVertices:{x:number,y:number,z:number,w:number}[], translation:{x:number,y:number,z:number}) => {
+    for(let i = 0; i < vertices.length; i++) {
+        let vertex = vertices[i]
+        let newpos = add3d(vertex,translation)
+        let output = outputVertices[i]        
+        output.x = newpos.x
+        output.y = newpos.y
+        output.z = newpos.z
+    }        
+}

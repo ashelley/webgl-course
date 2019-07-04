@@ -44,6 +44,18 @@ export abstract class ParserBase {
         return value
     }  
 
+    parseInt() {
+        let token = this.next()
+        if(token.tokenType != TokenType.NUMBER) {
+            this.unexpectedToken("Expected Number");
+        }
+        let value = parseFloat(token.value)
+        if(isNaN(value)) {
+            this.unexpectedToken("Token Value NaN")
+        }
+        return value
+    }    
+
     eol() {
         let token = this.token()
         return token.tokenType == TokenType.EOL || token.tokenType == TokenType.EOF

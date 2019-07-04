@@ -2,11 +2,11 @@ import SoftwareSceneBase from "./SoftwareSceneBase";
 import { RendererBase } from "../software_renderer/RendererBase";
 import { loadTextFile } from "../helpers/loadFile";
 import parseObjFile, { Obj } from "../helpers/parseObjFile";
-import { mat4x4, edgeFunction, add3d } from "../helpers/math";
+import { mat4x4, edgeFunction, add3d, rotateMatrixYAxis, rotateMatrixXAxis, rotateMatrixZAxis, buildRotationMatrixEuler } from "../helpers/math";
 import Matrix4 from "../helpers/Matrix4";
 import { Colors, makeFloatColor, floatToRGBColor } from "../primatives/Color";
 import { vec2, vec4, vec3 } from "../software_renderer/helpers";
-import { initializeEulerCamera, IEulerCamera } from "../primatives/Camera";
+import { initializeEulerCamera, IEulerCamera, buildCameraMatrixEuler } from "../primatives/Camera";
 
 export default class GURU7_1 extends SoftwareSceneBase {
     createRenderer(canvas: HTMLCanvasElement, width: number, height: number) {
@@ -47,22 +47,24 @@ class Renderer extends RendererBase {
 
         let cam = this.camera        
 
-        let mcam = Matrix4.identity()
         let mper = Matrix4.identity()
         let mscr = Matrix4.identity()
 
 
-        let mrot = Matrix4.identity()
+        // let mrot = Matrix4.identity()
 
-        if(this.angleY > 0) {
-            let cosTheta = Math.cos(this.angleY)
-            let sinTheta = Math.sin(this.angleY)
+        // if(this.angleY > 0) {
+        //     let cosTheta = Math.cos(this.angleY)
+        //     let sinTheta = Math.sin(this.angleY)
 
-            mrot = mat4x4(cosTheta, 0, -sinTheta, 0,
-                          0,        1, 0        , 0,
-                         sinTheta,  0, cosTheta,  0,
-                         0,         0, 0,         1)
-        }
+        //     mrot = mat4x4(cosTheta, 0, -sinTheta, 0,
+        //                   0,        1, 0        , 0,
+        //                  sinTheta,  0, cosTheta,  0,
+        //                  0,         0, 0,         1)
+        // }
+
+        //let mrot = rotateMatrixZAxis(this.angleY)
+        let mrot = buildRotationMatrixEuler(0,this.angleY,0)
 
         let transformedVertices:{x:number,y:number,z:number,w:number}[] = []
         
@@ -88,68 +90,7 @@ class Renderer extends RendererBase {
             v.z = newP.z            
         }
 
-
-        // step 1: create the inverse translation matrix for the camera position        
-        let matInverse = mat4x4( 1,        0,        0,        0,
-                                 0,        1,        0,        0,
-                                 0,        0,        1,        0,
-                                 -cam.pos.x,-cam.pos.y,-cam.pos.z,1 )
-
-        let matInvX:Float32Array // inverse camera x axis rotation matrix            
-        let matInvY:Float32Array // inverse camera y axis rotation matrix         
-        let matInvZ:Float32Array // inverse camera z axis rotation matrix     
-
-        // step 2: create the inverse rotation sequence for the camera
-        // rember either the transpose of the normal rotation matrix or
-        // plugging negative values into each of the rotations will result
-        // in an inverse matrix        
-
-        let thetaX = cam.dir.x
-        let thetaY = cam.dir.y
-        let thetaZ = cam.dir.z
-
-        // compute the sine and cosine of the angle x        
-        {
-            let cosTheta = Math.cos(thetaX) // no change since cos(-x) = cos(x)
-            let sinTheta = -Math.sin(thetaX) // sin(-x) = -sin(x)
-
-            matInvX = mat4x4(1,  0,        0        , 0,
-                             0,  cosTheta, sinTheta , 0,
-                             0, -sinTheta, cosTheta , 0,
-                             0, 0,         0        , 1)
-        }
-
-        // compute the sine and cosine of the angle y        
-        {
-            let cosTheta = Math.cos(thetaY) // no change since cos(-x) = cos(x)
-            let sinTheta = -Math.sin(thetaY) // sin(-x) = -sin(x)
-
-            matInvY = mat4x4(cosTheta, 0, -sinTheta,        0,
-                             0,        1,        0,         0,
-                             sinTheta, 0, cosTheta,         0,
-                             0,        0,         0,        1)
-        }     
-        
-        // compute the sine and cosine of the angle z        
-        {
-            let cosTheta = Math.cos(thetaZ) // no change since cos(-x) = cos(x)
-            let sinTheta = -Math.sin(thetaZ) // sin(-x) = -sin(x)
-
-            matInvZ = mat4x4(cosTheta, sinTheta, 0,       0,
-                             -sinTheta,cosTheta, 0,       0,
-                             0,        0,        1,        0,
-                             0,        0,        0,        1)                             
-        }          
-
-        //ZYX SEQUENCE
-        let matRot = new Float32Array(16)  // concatenated inverse rotation matrices            
-
-        let mTmp = new Float32Array(16)
-        Matrix4.mult(mTmp,matInvZ,matInvY)
-        Matrix4.mult(matRot,mTmp,matInvX)
-
-        let matCam = new Float32Array(16)
-        Matrix4.mult(matCam, matInverse, matRot)
+        let matCam = buildCameraMatrixEuler(cam);
 
         //WORLD TO CAMERA
         for(var i = 0; i < transformedVertices.length; i++) {
@@ -195,7 +136,7 @@ class Renderer extends RendererBase {
             this.screenSpaceLine(v2.x,v2.y, v0.x,v0.y, Colors.GREEN)
         }             
 
-        this.angleY++
+        this.angleY+= 0.1
 
     }
 }

@@ -1,4 +1,5 @@
 import Vector3 from "./Vector3";
+import Matrix4 from './Matrix4';
 
 export let abs = Math.abs
 export let int = Math.floor
@@ -164,4 +165,115 @@ export let mat4x4 = (a:number,b:number,c:number,d:number,e:number,f:number,g:num
     M[14] = o
     M[15] = p    
     return M
+}
+
+enum RotationSequence {
+    X = 1,
+    Y = 2,
+    Z = 4,
+}
+
+export let rotateMatrixXAxis = (thetaX:number) => {
+    let cosTheta = Math.cos(thetaX)
+    let sinTheta = Math.sin(thetaX)
+
+    let mrot = mat4x4(1,        0,        0, 0,
+                      0, cosTheta, sinTheta, 0,
+                      0,-sinTheta,-cosTheta, 0,
+                      0,         0, 0,         1)            
+    return mrot
+}
+
+export let rotateMatrixYAxis = (thetaY:number) => {
+    let cosTheta = Math.cos(thetaY)
+    let sinTheta = Math.sin(thetaY)
+
+    let mrot = mat4x4(cosTheta, 0, -sinTheta, 0,
+                      0,        1, 0        , 0,
+                      sinTheta, 0, cosTheta,  0,
+                      0,        0, 0,         1)        
+    return mrot
+}
+
+export let rotateMatrixZAxis = (thetaZ:number) => {
+    let cosTheta = Math.cos(thetaZ)
+    let sinTheta = Math.sin(thetaZ)
+
+    let mrot = mat4x4( cosTheta, sinTheta, 0, 0,
+                      -sinTheta, cosTheta, 0, 0,
+                      0,         0,        1, 0,
+                      0,         0,        0, 1)        
+    return mrot    
+}
+
+export let buildRotationMatrixEuler = (thetaX:number, thetaY:number,thetaZ:number) => {
+    let mrot:Float32Array
+
+    let rotations = 0
+    if(abs(thetaX) > Number.EPSILON) {
+        rotations |= RotationSequence.X
+    }
+    if(abs(thetaY) > Number.EPSILON) {
+        rotations |= RotationSequence.Y
+    }
+    if(abs(thetaZ) > Number.EPSILON) {
+        rotations |= RotationSequence.Z
+    }
+
+    switch(rotations) {
+        //NO ROTATION
+        case 0: 
+            mrot = Matrix4.identity()
+            break; 
+        //X ROTATION
+        case 1: {
+            mrot = rotateMatrixXAxis(thetaX)
+            break;
+        }
+        //Y ROTATION
+        case 2: {
+            mrot = rotateMatrixYAxis(thetaY)
+            break;
+        }
+        //XY ROTATION
+        case 3: {
+            let mx = rotateMatrixXAxis(thetaX)
+            let my = rotateMatrixYAxis(thetaY)
+            mrot = new Float32Array(16)
+            Matrix4.mult(mrot,mx,my)
+            break;
+        }
+        //Z ROTATION
+        case 4: {
+            mrot = rotateMatrixZAxis(thetaZ)
+            break;            
+        }
+        //XZ ROTATION
+        case 5: {
+            let mx = rotateMatrixXAxis(thetaX)
+            let mz = rotateMatrixZAxis(thetaZ)
+            mrot = new Float32Array(16)
+            Matrix4.mult(mrot,mx,mz)
+            break;
+        }
+        //YZ ROTATION
+        case 6: {
+            let my = rotateMatrixYAxis(thetaY)
+            let mz = rotateMatrixZAxis(thetaZ)
+            mrot = new Float32Array(16)
+            mrot = Matrix4.mult(mrot,my,mz)
+            break;
+        }
+        case 7: {
+            let mx = rotateMatrixYAxis(thetaX)
+            let my = rotateMatrixYAxis(thetaY)
+            let mz = rotateMatrixZAxis(thetaZ)
+            let mtmp = new Float32Array(16)
+            Matrix4.mult(mtmp,mx,my)            
+            mrot = new Float32Array(16)
+            Matrix4.mult(mrot,mtmp,mz)            
+        }
+    }
+
+    return mrot;
 }

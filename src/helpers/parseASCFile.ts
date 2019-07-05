@@ -42,7 +42,10 @@ export class ASCTokenStream extends TokenStream {
 
 export class ASCObject {
     name:string
+    
     vertices:{x:number,y:number,z:number, w:number}[] = []
+    faceBaseColors:{r:number,g:number,b:number,a:number}[] = []
+
     srcVertices:{x:number,y:number,z:number}[] = []
     srcVerticesByFaceIndex:{x:number,y:number,z:number}[] = []
 
@@ -72,6 +75,10 @@ export class ASCObject {
             }
 
             this.vertices.push(v0,v1,v2)
+
+            if(i % 3 == 0) {
+                this.faceBaseColors.push({r:1,g:1,b:1,a:1})
+            }
         }
     }
 

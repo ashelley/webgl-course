@@ -30,7 +30,8 @@ class Renderer extends RendererBase {
             dir: vec4(0,0,0,1),
             target: vec4(0,0,0,0),
             nearClipZ: 50,
-            farClipZ: 500
+            farClipZ: 500,
+            fov: 90
         })        
     }
 

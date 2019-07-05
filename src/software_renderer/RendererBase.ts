@@ -214,7 +214,7 @@ export abstract class RendererBase {
 
     }
 
-    triangleShadedSegmented(t0:Vector2, t1:Vector2, t2:Vector2, color:Color, 
+    triangleShadedSegmented(t0:{x:number,y:number}, t1:{x:number,y:number}, t2:{x:number,y:number}, color:Color, 
                                                                 colorBottom?:Color) {
         sortPointByY(t0,t1)
         sortPointByY(t0,t2)
@@ -258,8 +258,8 @@ export abstract class RendererBase {
 
     }    
 
-    triangleShadedBBoxPointsInTriangle(t0:Vector2, t1:Vector2,t2:Vector2, color:Color) {
-        var points:[Vector2,Vector2,Vector2] = [t0,t1,t2]
+    triangleShadedBBoxPointsInTriangle(t0:{x:number,y:number}, t1:{x:number,y:number},t2:{x:number,y:number}, color:Color) {
+        var points:[{x:number,y:number},{x:number,y:number},{x:number,y:number}] = [t0,t1,t2]
         var bbox = boundingBox(t0,t1,t2)
         for(var x = bbox.min.x; x < bbox.max.x; x++) {
             for(var y = bbox.min.y; y < bbox.max.y; y++) {
@@ -270,8 +270,8 @@ export abstract class RendererBase {
         }
     }
 
-    triangleShadedZBuffer(t0:Vector3,t1:Vector3,t2:Vector3, color:Color) {
-        let points:[Vector3,Vector3,Vector3] = [t0,t1,t2]
+    triangleShadedZBuffer(t0:{x:number,y:number,z:number},t1:{x:number,y:number,z:number},t2:{x:number,y:number,z:number}, color:Color) {
+        let points:[{x:number,y:number,z:number},{x:number,y:number,z:number},{x:number,y:number,z:number}] = [t0,t1,t2]
         let bbox = boundingBox(t0,t1,t2)
         for(let x = bbox.min.x; x < bbox.max.x; x++) {
             for(let y = bbox.min.y; y < bbox.max.y; y++) {
@@ -288,6 +288,70 @@ export abstract class RendererBase {
                 }
             }
         }        
+    }
+
+    triangleShaded(t0:{x:number,y:number}, t1:{x:number,y:number},t2:{x:number,y:number}, color:Color) {
+        //draw triangles by decomposing into 2 triangles with flat top and flat bottom
+        let x0 = int(t0.x)
+        let y0 = int(t0.y)
+        let x1 = int(t1.x)
+        let y1 = int(t1.y)        
+        let x2 = int(t2.x)
+        let y2 = int(t2.y)        
+
+        // //straight lines
+        // if((x0 == x1 && x1 == x2) || y0==y1 && y1==y2) return
+
+        // //sort in ascending order
+        // if(y1 < y0) {
+        //     let tmpX = x1
+        //     let tmpY = y1
+        //     x1 = x0
+        //     y1 = y0
+        //     x0 = tmpX
+        //     y0 = tmpY
+        // }
+
+        // //now p0 and p1 are in order
+        // if(y2 < y0)  {
+        //     let tmpX = x2
+        //     let tmpY = y2
+        //     x2 = x0
+        //     y2 = y0
+        //     x0 = tmpX
+        //     y0 = tmpY            
+        // }
+
+        // //now y2 and y1
+        // if(y2 < y0)  {
+        //     let tmpX = x2
+        //     let tmpY = y2
+        //     x2 = x1
+        //     y2 = y1
+        //     x1 = tmpX
+        //     y1 = tmpY            
+        // }
+
+        //this.triangleShadedBBoxPointsInTriangle({x:x0,y:y0},{x:x1,y:y1},{x:x2,y:y2}, color)
+        this.triangleShadedSegmented({x:x0,y:y0},{x:x1,y:y1},{x:x2,y:y2}, color)
+        
+        
+    }
+
+    drawBottomTri(x0:number,y0:number,x1:number,y1:number,x2:number,y2:number,color:Color) {
+        if(x2 < x1) {
+            let tmpX = x1
+            x1 = x2
+            x2 = tmpX
+        }
+
+        let height = y2 - y0
+        let dxLeft = (x1-x0)/height
+        let dxRight = (x2-x0)/height
+
+ 
+        throw new Error("Not implmemented")
+
     }
 
     applyProjection(viewport:Float32Array, projection:Float32Array, p:Vector3) {

@@ -108,6 +108,7 @@ interface IEulerCameraInit {
 	viewportHeight:number
 	nearClipZ:number
 	farClipZ:number
+	fov:number
 }
 
 export let initializeEulerCamera = (args:IEulerCameraInit):IEulerCamera => {
@@ -123,7 +124,7 @@ export let initializeEulerCamera = (args:IEulerCameraInit):IEulerCamera => {
 	let nearclip = args.nearClipZ
 	let farclip = args.farClipZ
 
-	let fov = 90
+	let fov = args.fov
 	let aspectRatio = args.viewportWidth/args.viewportHeight
 
 	let viewplaneWidth = 2
@@ -145,6 +146,8 @@ export let initializeEulerCamera = (args:IEulerCameraInit):IEulerCamera => {
 		bottomClippingPlane = vec3(0,-1,-1) //-y=z            
 	}
 	else {
+		//let origin = vec3(0,0,0)
+		//let normalToPlane = vec3(cameraViewDistance,0,-viewplaneWidth/2.0)
 
 	}
 
@@ -236,17 +239,17 @@ export let cameraToPerspective = (vertices:{x:number,y:number,z:number,w:number}
 	for(let i = 0; i < vertices.length; i++) {
 		let vertex = vertices[i]
 		vertex.x = cam.viewDistance * vertex.x / vertex.z
-		vertex.y = cam.viewDistance * vertex.y / vertex.z
+		vertex.y = cam.viewDistance * vertex.y * cam.aspectRatio / vertex.z
 	}
 }
 
 export let perspectiveToScreen = (vertices:{x:number,y:number,z:number,w:number}[], viewportWidth:number,viewportHeight:number) => {
-	let alpha = 0.5 * viewportWidth - 0.5
-	let beta = 0.5 * viewportHeight - 0.5
+	let alpha = (0.5 * viewportWidth) - 0.5
+	let beta = (0.5 * viewportHeight) - 0.5
 
 	for(let i = 0; i < vertices.length; i++) {
 		let vertex = vertices[i]
-		vertex.x = alpha + alpha * vertex.x
-		vertex.y = beta - beta * vertex.y
+		vertex.x = alpha + (alpha * vertex.x)
+		vertex.y = beta - (beta * vertex.y)
 	}
 }

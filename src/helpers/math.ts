@@ -280,11 +280,13 @@ export let buildRotationMatrixEuler = (thetaX:number, thetaY:number,thetaZ:numbe
 
 export interface IRenderable {
     vertices: {x:number,y:number,z:number,w:number}[]    
+    faceBaseColors:{r:number,g:number,b:number,a:number}[]
 }
 
 export interface IRenderList {
     vertices:{x:number,y:number,z:number,w:number}[]
     transformedVertices:{x:number,y:number,z:number,w:number}[]
+    faceColors:{r:number,g:number,b:number,a:number}[]
 }
 
 

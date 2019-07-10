@@ -415,12 +415,12 @@ export abstract class RendererBase {
         }        
     }
 
-    abstract doRenderWork();
+    abstract doRenderWork(deltaMS:number);
     async init() {
         
     }
 
-    render = () => {
+    render = (deltaMS:number) => {
         let width = this.width
         let height = this.height
 
@@ -431,7 +431,7 @@ export abstract class RendererBase {
             //console.log(performance.now() - currentTick, 'getImageData')        
         }
 
-        this.doRenderWork()
+        this.doRenderWork(deltaMS)
 
         {
             //let currentTick = performance.now()

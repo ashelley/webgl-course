@@ -4,19 +4,79 @@ import { loadTextFile } from "../helpers/loadFile";
 import { parseASCfile, ASCObject } from "../helpers/parseASCFile";
 import { IEulerCamera, initializeEulerCamera, buildCameraMatrixEuler, cameraToPerspective, perspectiveToScreen } from '../primatives/Camera';
 import { vec4, vec3 } from '../software_renderer/helpers';
-import { buildRotationMatrixEuler, applyTransformationMatrix, applyTranslation, subtract3d, cross, normalize, dot, multiplyColor, mat4x4, length3d, barycentric, scale3d, multiply3d, add3d, clampMax, centroid } from '../helpers/math';
+import { buildRotationMatrixEuler, applyTransformationMatrix, applyTranslation, subtract3d, cross, normalize, dot, multiplyColor, mat4x4, length3d, barycentric, scale3d, multiply3d, add3d, clampMax, centroid, rotateMatrixXAxis } from '../helpers/math';
 import { Colors, makeRGBColor, floatToRGBColor, makeFloatColor } from '../primatives/Color';
 import cube from '../primatives/cube';
 import { number } from 'prop-types';
 import { addSunLight, addAmbientLight, prepareRenderGroupForRendering, createRenderGroup, pushRenderable, IRenderGroup } from '../helpers/rendering';
+import React from 'react';
+
+interface SceneOptions {
+    renderWireFrame: boolean
+    renderNormals: boolean
+    rotateX:boolean
+    rotateY:boolean
+    rotateZ:boolean
+}
 
 export default class GURU8_8 extends SoftwareSceneBase {
     createRenderer(canvas: HTMLCanvasElement, width: number, height: number) {
         return new Renderer(canvas, width, height)
     }
+
+    getInitialState():SceneOptions {
+        return {
+            renderWireFrame: false,
+            renderNormals: false,
+            rotateX: false,
+            rotateY: false,
+            rotateZ: false
+        }
+    }
+
+    toggleBoolean = (option:keyof SceneOptions) => e => {
+        e.stopPropagation()
+        e.preventDefault()
+        this.setState({[option]: !this.state[option]})
+    }
+
+    debugUI(state:SceneOptions) {
+        let renderer = this.renderer as Renderer        
+        if(renderer != null) {
+            renderer.renderWireFrame = state.renderWireFrame
+            renderer.renderNormals = state.renderNormals
+            renderer.rotateX = state.rotateX
+            renderer.rotateY = state.rotateY
+            renderer.rotateZ = state.rotateZ    
+        }
+        return <>
+            <div>
+                <button onClick={this.toggleBoolean('renderWireFrame')}>Toggle WireFrame {state.renderWireFrame ? "Off": "On"}</button>
+            </div>
+            <div>
+                <button onClick={this.toggleBoolean('renderNormals')}>Toggle Normals {state.renderNormals ? "Off": "On"}</button>
+            </div>   
+            <div>
+                <button onClick={this.toggleBoolean('rotateX')}>Toggle Roatate X {state.rotateX ? "Off": "On"}</button>
+            </div>                      
+            <div>
+                <button onClick={this.toggleBoolean('rotateY')}>Toggle Roatate Y {state.rotateX ? "Off": "On"}</button>
+            </div>                      
+            <div>
+                <button onClick={this.toggleBoolean('rotateZ')}>Toggle Roatate Z {state.rotateX ? "Off": "On"}</button>
+            </div>                                              
+        </>
+    }      
+
 }
 
 class Renderer extends RendererBase {
+
+    renderWireFrame = false
+    renderNormals = false
+    rotateX = false
+    rotateY = false
+    rotateZ = false
 
     camera:IEulerCamera
     sphere:ASCObject
@@ -48,7 +108,7 @@ class Renderer extends RendererBase {
     }
 
 
-    doRenderWork() {
+    doRenderWork(deltaMS) {
         this.clear();
         this.setupZBuffer()
 
@@ -81,9 +141,24 @@ class Renderer extends RendererBase {
 
 
         this.drawShaded(renderGroup, this.camera.pos)
-        this.drawWireFrame(renderGroup, this.camera.pos)        
+        
+        if(this.renderWireFrame) {
+            this.drawWireFrame(renderGroup, this.camera.pos)        
+        }
 
-        this.sphereRotation.y += 0.01
+
+        if(this.rotateX) {
+            this.sphereRotation.x -= 0.5 * deltaMS
+        }
+
+        if(this.rotateY) {
+            this.sphereRotation.y -= 0.5 * deltaMS
+        }
+        
+        if(this.rotateZ) {
+            this.sphereRotation.z -= 0.5 * deltaMS
+        }
+
         //this.sphereRotation.x += 0.01
     }
 
@@ -105,30 +180,31 @@ class Renderer extends RendererBase {
 
             //this.triangleShadedZBuffer(p0,p1,p2, color)
 
-            let c = centroid(p0,p1,p2)
+            if(this.renderNormals) {
+                let c = centroid(p0,p1,p2)            
+                this.drawPoint(c.x,c.y,2,Colors.WHITE)
 
-            this.drawPoint(c.x,c.y,2,Colors.WHITE)
 
+                {
+                    let normalLineEnd = add3d(c,scale3d(normal,25))
+                    this.screenSpaceLine(c.x,c.y,normalLineEnd.x,normalLineEnd.y, Colors.YELLOW)
+                }
 
-            {
-                let normalLineEnd = add3d(c,scale3d(normal,25))
-                this.screenSpaceLine(c.x,c.y,normalLineEnd.x,normalLineEnd.y, Colors.YELLOW)
-            }
+                // {
+                //     let normalLineEnd = add3d(p0,scale3d(normal,50))
+                //     this.screenSpaceLine(p0.x,p0.y,normalLineEnd.x,normalLineEnd.y, Colors.RED)
+                // }            
 
-            // {
-            //     let normalLineEnd = add3d(p0,scale3d(normal,50))
-            //     this.screenSpaceLine(p0.x,p0.y,normalLineEnd.x,normalLineEnd.y, Colors.RED)
-            // }            
+                // {
+                //     let normalLineEnd = add3d(p1,scale3d(normal,50))
+                //     this.screenSpaceLine(p1.x,p1.y,normalLineEnd.x,normalLineEnd.y, Colors.GREEN)
+                // }             
 
-            // {
-            //     let normalLineEnd = add3d(p1,scale3d(normal,50))
-            //     this.screenSpaceLine(p1.x,p1.y,normalLineEnd.x,normalLineEnd.y, Colors.GREEN)
-            // }             
-
-            // {
-            //     let normalLineEnd = add3d(p2,scale3d(normal,50))
-            //     this.screenSpaceLine(p2.x,p2.y,normalLineEnd.x,normalLineEnd.y, Colors.BLUE)
-            // }                         
+                // {
+                //     let normalLineEnd = add3d(p2,scale3d(normal,50))
+                //     this.screenSpaceLine(p2.x,p2.y,normalLineEnd.x,normalLineEnd.y, Colors.BLUE)
+                // }              
+            }           
         }
     }
 

@@ -282,28 +282,6 @@ export let buildRotationMatrixEuler = (thetaX:number, thetaY:number,thetaZ:numbe
     return mrot;
 }
 
-export interface IRenderable {
-    vertices: {x:number,y:number,z:number,w:number}[]    
-    faceBaseColors:{r:number,g:number,b:number,a:number}[]
-}
-
-export interface IRenderList {
-    vertices:{x:number,y:number,z:number,w:number}[]
-}
-
-export interface IRenderGroup {
-    numVertices: number
-    numFaces:number
-    worldSpaceVertices:{x:number,y:number,z:number,w:number}[]        
-    transformedVertices:{x:number,y:number,z:number,w:number}[]    
-    faceNormals:{x:number,y:number,z:number}[]    
-    vertexNormals:{x:number,y:number,z:number}[]    
-    faceBaseColors:{r:number,g:number,b:number,a:number}[]
-    calculatedFaceColors:{r:number,g:number,b:number,a:number}[]
-    isBackFace:boolean[]
-}
-
-
 export let applyTransformationMatrix = (vertices:{x:number,y:number,z:number,w:number}[], mTransform:Float32Array) => {
     for(let i = 0; i < vertices.length; i++) {
         let vertex = vertices[i]
@@ -327,4 +305,34 @@ export let applyTranslation = (vertices:{x:number,y:number,z:number,w:number}[],
         output.y = newpos.y
         output.z = newpos.z
     }        
+}
+
+export let centroid = (p0:{x:number,y:number,z:number},p1:{x:number,y:number,z:number},p2:{x:number,y:number,z:number}) => {
+    let cX = (p0.x + p1.x + p2.x) / 3
+    let cY = (p0.y + p1.y + p2.y) / 3 
+    let cZ = (p0.z + p1.z + p2.z) / 3
+    return {x:cX,y:cY,z:cZ}    
+}
+
+export let calcNormal = (p0:{x:number,y:number,z:number},p1:{x:number,y:number,z:number},p2:{x:number,y:number,z:number}, doNormalize:boolean) => {
+    let u = subtract3d(p1,p0)
+    let v = subtract3d(p2,p0)    
+    let n = cross(u,v)
+
+    n.y = -n.y
+
+    if(doNormalize) {
+        normalize(n)
+    }
+    return n
+}
+
+export let isBackFace = (normal:{x:number,y:number,z:number},fromPos:{x:number,y:number,z:number}, cameraPos:{x:number,y:number,z:number}) => {
+    let vectorToCamera = subtract3d(cameraPos,fromPos)
+
+    normalize(vectorToCamera) 
+
+    let dp = dot(normal,vectorToCamera) //TODO: do we need normalized vectors here?
+
+    return dp < 0
 }

@@ -53,14 +53,14 @@ let prepareRenderGroupForRendering = (renderGroup:IRenderGroup, camPos:{x:number
         renderGroup.transformedVertices.push({x:vertex.x,y:vertex.y,z:vertex.z,w:vertex.w})        
     }    
     for(let i = 0, f = 0; i < renderGroup.numVertices; i+=3, f++) {
-        let p0 = renderGroup.worldSpaceVertices[i]
+        let p0 = renderGroup.worldSpaceVertices[i+0]
         let p1 = renderGroup.worldSpaceVertices[i+1]
         let p2 = renderGroup.worldSpaceVertices[i+2]
         
         let n = calcNormal(p0,p1,p2,true) //TODO: normalize?        
-        let c = centroid(p0,p1,p2)
+        //let c = centroid(p0,p1,p2)
 
-        let backFacing = isBackFace(n,c,camPos)
+        let backFacing = isBackFace(n,p0,camPos)
 
         renderGroup.faceNormals[f] = n
         renderGroup.isBackFace[f] = backFacing
@@ -83,7 +83,7 @@ class Renderer extends RendererBase {
         let parsedASC = parseASCfile(ascSource);    
 
         let sphere = parsedASC.objects[0]
-        sphere.compileVertices({swapYZ: true, invertWindingOrder: false, scaleVerts: {x: 5, y: 5, z: 5}});
+        sphere.compileVertices({swapYZ: true, invertWindingOrder: true, scaleVerts: {x: 5, y: 5, z: 5}});
 
         this.sphere = sphere
 
@@ -136,7 +136,7 @@ class Renderer extends RendererBase {
         this.drawWireFrame(renderGroup, this.camera.pos)        
 
         this.sphereRotation.y += 0.01
-        this.sphereRotation.x += 0.01
+        //this.sphereRotation.x += 0.01
     }
 
     drawShaded(renderGroup:IRenderGroup, cameraPos:{x:number,y:number,z:number}) {
@@ -159,12 +159,28 @@ class Renderer extends RendererBase {
 
             let c = centroid(p0,p1,p2)
 
-            this.drawPoint(c.x,c.y,2,Colors.RED)
+            this.drawPoint(c.x,c.y,2,Colors.WHITE)
 
 
-            let normalLineEnd = add3d(c,scale3d(normal,50))
+            {
+                let normalLineEnd = add3d(c,scale3d(normal,25))
+                this.screenSpaceLine(c.x,c.y,normalLineEnd.x,normalLineEnd.y, Colors.YELLOW)
+            }
 
-             this.screenSpaceLine(c.x,c.y,normalLineEnd.x,normalLineEnd.y, Colors.GREEN)
+            // {
+            //     let normalLineEnd = add3d(p0,scale3d(normal,50))
+            //     this.screenSpaceLine(p0.x,p0.y,normalLineEnd.x,normalLineEnd.y, Colors.RED)
+            // }            
+
+            // {
+            //     let normalLineEnd = add3d(p1,scale3d(normal,50))
+            //     this.screenSpaceLine(p1.x,p1.y,normalLineEnd.x,normalLineEnd.y, Colors.GREEN)
+            // }             
+
+            // {
+            //     let normalLineEnd = add3d(p2,scale3d(normal,50))
+            //     this.screenSpaceLine(p2.x,p2.y,normalLineEnd.x,normalLineEnd.y, Colors.BLUE)
+            // }                         
         }
     }
 
@@ -201,6 +217,8 @@ let calcNormal = (p0:{x:number,y:number,z:number},p1:{x:number,y:number,z:number
     let v = subtract3d(p2,p0)    
     let n = cross(u,v)
 
+    n.y = -n.y
+
     if(doNormalize) {
         normalize(n)
     }
@@ -208,13 +226,13 @@ let calcNormal = (p0:{x:number,y:number,z:number},p1:{x:number,y:number,z:number
 }
 
 let isBackFace = (normal:{x:number,y:number,z:number},fromPos:{x:number,y:number,z:number}, cameraPos:{x:number,y:number,z:number}) => {
-    let vectorToCamera = subtract3d(fromPos,cameraPos)
+    let vectorToCamera = subtract3d(cameraPos,fromPos)
 
     normalize(vectorToCamera) 
 
     let dp = dot(normal,vectorToCamera) //TODO: do we need normalized vectors here?
 
-    return dp > 0 //TODO: should be < 0 = backface why is this backwards right now?
+    return dp < 0
 }
 
 let addAmbientLight = (renderGroup:IRenderGroup, lightColor:{r:number,g:number,b:number}) => {

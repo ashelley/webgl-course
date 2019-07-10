@@ -101,28 +101,25 @@ export default abstract class SoftwareSceneBase extends React.Component<{},{}> i
         renderTime = parseFloat(renderTime.toFixed(2))
 
         return (
-            <div style={{}}>
+            <div style={{fontFamily: 'monospace'}}>
+                {this.renderer && <div style={{padding: 3}}>Res: {this.renderer.width} x {this.renderer.height}</div>}                                
                 <button onClick={this.handleLockedFpsToggle}>{fpsLimit ? fpsLimit: "Variable"} FPS</button>
                 <div style={{display:'flex', flexDirection:'row'}}>
-                    <div style={{padding: 3}}>FPS: {fps}</div>
-                    <div style={{padding: 3}}>Total: {lastFrameMS} ms</div>
+                    <div style={{padding: 3}}>FPS: {fps.toFixed(2)}</div>
+                    <div style={{padding: 3}}>Total: {lastFrameMS.toFixed(2)} ms</div>
                 </div>
-                <div style={{padding: 3}}>Renderer: {renderTime} ms</div>                
+                <div style={{padding: 3}}>Renderer: {renderTime.toFixed(2)} ms</div>                
                 <div style={{padding: 3}}>Lost: {(lastFrameMS - renderTime).toFixed(2)} ms</div>                
+                <div>mouseX :{this.state.mouseX} mouseY: {this.state.mouseY}</div>                    
             </div>
         )
     }
 
     render() {
-
-
-
         return (
             <div style={{position:'relative'}}>
                 <div style={{display:'flex', flexDirection:'column', position:'absolute', right: 0, padding: 3, backgroundColor:'white', border:'1px solid black'}}>
                     {this.rendererUI()}
-                    <div>mouseX :{this.state.mouseX} mouseY: {this.state.mouseY}</div>                    
-                    {this.renderer && <div style={{color:'white', padding: 3}}>{this.renderer.width} x {this.renderer.height}</div>}
                     {this.renderUI()}                    
                 </div>
                 <canvas ref={this.canvasRef} onMouseMove={this.handleMouseMove} style={{border: '1px solid black'}} />

@@ -290,6 +290,20 @@ export abstract class RendererBase {
         }        
     }
 
+    drawPoint(x:number,y:number,radius:number,color:Color) {
+        let halfRadius = radius/2;
+        let xStart = Math.floor(x - halfRadius)
+        let xEnd = Math.floor(x + halfRadius)
+        let yStart = Math.floor(y - halfRadius)
+        let yEnd = Math.floor(y + halfRadius) 
+
+        for(let pY = yStart; pY <= yEnd; pY++) {
+            for(let pX = xStart; pX <= xEnd; pX++) {
+                this.setPixel(pX,pY,color)
+            }
+        }
+    }
+
     triangleShaded(t0:{x:number,y:number}, t1:{x:number,y:number},t2:{x:number,y:number}, color:Color) {
         //draw triangles by decomposing into 2 triangles with flat top and flat bottom
         let x0 = int(t0.x)
@@ -336,7 +350,7 @@ export abstract class RendererBase {
         this.triangleShadedSegmented({x:x0,y:y0},{x:x1,y:y1},{x:x2,y:y2}, color)
         
         
-    }
+    }    
 
     drawBottomTri(x0:number,y0:number,x1:number,y1:number,x2:number,y2:number,color:Color) {
         if(x2 < x1) {

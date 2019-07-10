@@ -58,6 +58,10 @@ export let length2 = (v:{x:number,y:number,z:number}) => {
     return dot(v,v)
 }
 
+export let clampMax = (n:number,max:number) => {
+    return Math.min(n,max)
+}
+
 export let normalize = (v:{x:number,y:number,z:number}) => {
     //T length2() const { return x * x + y * y + z * z; } 
 
@@ -285,16 +289,27 @@ export interface IRenderable {
 
 export interface IRenderList {
     vertices:{x:number,y:number,z:number,w:number}[]
-    transformedVertices:{x:number,y:number,z:number,w:number}[]
-    faceColors:{r:number,g:number,b:number,a:number}[]
+}
+
+export interface IRenderGroup {
+    numVertices: number
+    numFaces:number
+    worldSpaceVertices:{x:number,y:number,z:number,w:number}[]        
+    transformedVertices:{x:number,y:number,z:number,w:number}[]    
+    faceNormals:{x:number,y:number,z:number}[]    
+    vertexNormals:{x:number,y:number,z:number}[]    
+    faceBaseColors:{r:number,g:number,b:number,a:number}[]
+    calculatedFaceColors:{r:number,g:number,b:number,a:number}[]
+    isBackFace:boolean[]
 }
 
 
-export let applyTransformationMatrix = (vertices:{x:number,y:number,z:number,w:number}[], outputVertices:{x:number,y:number,z:number,w:number}[], mTransform:Float32Array) => {
+export let applyTransformationMatrix = (vertices:{x:number,y:number,z:number,w:number}[], mTransform:Float32Array) => {
     for(let i = 0; i < vertices.length; i++) {
         let vertex = vertices[i]
         let [x,y,z,w] = Matrix4.multiplyVector(mTransform, [vertex.x,vertex.y,vertex.z,vertex.w])
-        let output = outputVertices[i]        
+        //let output = vertices[i]        
+        let output = vertex
         output.x = x
         output.y = y
         output.z = z
@@ -302,11 +317,12 @@ export let applyTransformationMatrix = (vertices:{x:number,y:number,z:number,w:n
     }
 }
 
-export let applyTranslation = (vertices:{x:number,y:number,z:number,w:number}[], outputVertices:{x:number,y:number,z:number,w:number}[], translation:{x:number,y:number,z:number}) => {
+export let applyTranslation = (vertices:{x:number,y:number,z:number,w:number}[], translation:{x:number,y:number,z:number}) => {
     for(let i = 0; i < vertices.length; i++) {
         let vertex = vertices[i]
         let newpos = add3d(vertex,translation)
-        let output = outputVertices[i]        
+        //let output = vertices[i]        
+        let output = vertex
         output.x = newpos.x
         output.y = newpos.y
         output.z = newpos.z

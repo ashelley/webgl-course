@@ -37,7 +37,11 @@ export default class GURU8_8 extends SoftwareSceneBase {
     toggleBoolean = (option:keyof SceneOptions) => e => {
         e.stopPropagation()
         e.preventDefault()
-        this.setState({[option]: !this.state[option]})
+        this.setState(state => {
+            return {
+                [option]: !state[option]
+            }
+        })
     }
 
     debugUI(state:SceneOptions) {
@@ -60,10 +64,10 @@ export default class GURU8_8 extends SoftwareSceneBase {
                 <button onClick={this.toggleBoolean('rotateX')}>Toggle Roatate X {state.rotateX ? "Off": "On"}</button>
             </div>                      
             <div>
-                <button onClick={this.toggleBoolean('rotateY')}>Toggle Roatate Y {state.rotateX ? "Off": "On"}</button>
+                <button onClick={this.toggleBoolean('rotateY')}>Toggle Roatate Y {state.rotateY ? "Off": "On"}</button>
             </div>                      
             <div>
-                <button onClick={this.toggleBoolean('rotateZ')}>Toggle Roatate Z {state.rotateX ? "Off": "On"}</button>
+                <button onClick={this.toggleBoolean('rotateZ')}>Toggle Roatate Z {state.rotateZ ? "Off": "On"}</button>
             </div>                                              
         </>
     }      

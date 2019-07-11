@@ -183,7 +183,7 @@ export let rotateMatrixXAxis = (thetaX:number) => {
 
     let mrot = mat4x4(1,        0,        0, 0,
                       0, cosTheta, sinTheta, 0,
-                      0,-sinTheta,-cosTheta, 0,
+                      0,-sinTheta, cosTheta, 0,
                       0,         0, 0,         1)            
     return mrot
 }
@@ -269,7 +269,7 @@ export let buildRotationMatrixEuler = (thetaX:number, thetaY:number,thetaZ:numbe
             break;
         }
         case 7: {
-            let mx = rotateMatrixYAxis(thetaX)
+            let mx = rotateMatrixXAxis(thetaX)
             let my = rotateMatrixYAxis(thetaY)
             let mz = rotateMatrixZAxis(thetaZ)
             let mtmp = new Float32Array(16)

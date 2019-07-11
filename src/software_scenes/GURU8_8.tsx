@@ -104,7 +104,7 @@ class Renderer extends RendererBase {
         this.camera = initializeEulerCamera({
             viewportWidth: this.width, 
             viewportHeight: this.height,
-            pos: vec4(0,0,-100,1),
+            pos: vec4(0,0,-150,1),
             dir: vec4(0,0,0,1),
             target: vec4(0,0,0,0),
             nearClipZ: 200,
@@ -121,28 +121,18 @@ class Renderer extends RendererBase {
         }        
     }
 
+    doLighting(renderGroup:IRenderGroup, deltaMS:number) {
+        // move point light source in ellipse around game world
+        let pointLightPos = this.pointLight.pos
+        let pointLightAngle = this.pointLightAngle
+        pointLightPos.x = 300 * Math.cos(pointLightAngle)
+        pointLightPos.y = -200
+        pointLightPos.z = 300 * Math.sin(pointLightAngle)
 
-    doRenderWork(deltaMS) {
-        this.clear();
-        this.setupZBuffer()
-
-        let mcam = buildCameraMatrixEuler(this.camera)        
-
-        let renderGroup = createRenderGroup()
-        pushRenderable(renderGroup,this.sphere)
-
-
-        let mrot = buildRotationMatrixEuler(this.sphereRotation.x, this.sphereRotation.y, this.sphereRotation.z)
-
-        applyTransformationMatrix(renderGroup.worldSpaceVertices,mrot)
-        applyTranslation(renderGroup.worldSpaceVertices,this.spherePos)
-
-        prepareRenderGroupForRendering(renderGroup, this.camera.pos)
-
-        applyTransformationMatrix(renderGroup.transformedVertices, mcam)
-
-        cameraToPerspective(renderGroup.transformedVertices, this.camera)
-        perspectiveToScreen(renderGroup.transformedVertices, this.width, this.height)        
+        pointLightAngle += 3 * deltaMS
+        if(pointLightAngle > 360) pointLightAngle = 0
+        this.pointLightAngle = pointLightAngle        
+        
 
         let ambientLightColor = makeFloatColor(0.1,0.1,0.1)
 
@@ -153,7 +143,32 @@ class Renderer extends RendererBase {
 
         addSunLight(renderGroup,sunLightDir, sunLightColor)
 
-        addPointLight(renderGroup, this.pointLight)
+        addPointLight(renderGroup, this.pointLight)                
+    }
+
+
+    doRenderWork(deltaMS) {
+        this.clear();
+        this.setupZBuffer()
+
+        let mcam = buildCameraMatrixEuler(this.camera)        
+
+        let renderGroup = createRenderGroup()
+        pushRenderable(renderGroup,this.sphere)
+
+        let mrot = buildRotationMatrixEuler(this.sphereRotation.x, this.sphereRotation.y, this.sphereRotation.z)
+
+        applyTransformationMatrix(renderGroup.worldSpaceVertices,mrot)
+        applyTranslation(renderGroup.worldSpaceVertices,this.spherePos)
+
+        prepareRenderGroupForRendering(renderGroup, this.camera.pos)      
+        
+        this.doLighting(renderGroup,deltaMS)
+
+        applyTransformationMatrix(renderGroup.transformedVertices, mcam)
+
+        cameraToPerspective(renderGroup.transformedVertices, this.camera)
+        perspectiveToScreen(renderGroup.transformedVertices, this.width, this.height)        
 
 
         this.drawShaded(renderGroup, this.camera.pos)
@@ -174,17 +189,6 @@ class Renderer extends RendererBase {
         if(this.rotateZ) {
             this.sphereRotation.z -= 0.5 * deltaMS
         }
-
-        // move point light source in ellipse around game world
-        let pointLightPos = this.pointLight.pos
-        let pointLightAngle = this.pointLightAngle
-        pointLightPos.x = 300 * Math.cos(pointLightAngle)
-        pointLightPos.y = 200
-        pointLightPos.z = 300 * Math.sin(pointLightAngle)
-
-        pointLightAngle += 3 * deltaMS
-        if(pointLightAngle > 360) pointLightAngle = 0
-        this.pointLightAngle = pointLightAngle
     }
 
     drawShaded(renderGroup:IRenderGroup, cameraPos:{x:number,y:number,z:number}) {

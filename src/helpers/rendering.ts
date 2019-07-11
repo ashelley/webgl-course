@@ -1,4 +1,4 @@
-import { calcNormal, isBackFace, clampMax, dot, length3d, normalize, subtract3d } from './math';
+import { calcNormal, isBackFace, clampMax, dot, length3d, normalize, subtract3d, int } from './math';
 import { Color } from '../primatives/Color';
 
 export interface IRenderable {
@@ -119,11 +119,11 @@ export let addSunLight = (renderGroup:IRenderGroup, lightDir:{x:number,y:number,
             color.r += lightColor.r * dp * intensity
             color.g += lightColor.g * dp * intensity
             color.b += lightColor.b * dp * intensity
-        }
 
-        color.r = clampMax(color.r,1)
-        color.g = clampMax(color.g,1)
-        color.b = clampMax(color.b,1)
+            color.r = clampMax(color.r,1)
+            color.g = clampMax(color.g,1)
+            color.b = clampMax(color.b,1)            
+        }
     }
 }
 
@@ -139,18 +139,17 @@ export let addPointLight = (renderGroup:IRenderGroup, light:IPointLight) => {
     for(let i = 0, f = 0; i < renderGroup.numVertices; i+=3,f++) {    
         let backFacing = renderGroup.isBackFace[f]
         if(backFacing) continue            
+
         let color = renderGroup.calculatedFaceColors[f]
         let baseColor = renderGroup.faceBaseColors[f]
         let normal = renderGroup.faceNormals[f]
         let normalLength = renderGroup.normalLengths[f]
         let p0 = renderGroup.transformedVertices[i]
         
-        let vLight = subtract3d(p0,light.pos)
+        let surfaceToLight = subtract3d(p0,light.pos)
+        let distanceToLight = length3d(surfaceToLight)
 
-        let distanceToLight = length3d(vLight)
-
-
-        let dp = dot(normal,vLight)
+        let dp = dot(normal,surfaceToLight)
 
         if(dp > 0) {
             let attenuation = light.constantAttenuation + (light.linearAttenuation * distanceToLight) + (light.quadraticAttenuation * distanceToLight * distanceToLight)
@@ -158,10 +157,65 @@ export let addPointLight = (renderGroup:IRenderGroup, light:IPointLight) => {
             color.r += light.color.r * baseColor.r * intensity
             color.g += light.color.g * baseColor.g * intensity
             color.b += light.color.b * baseColor.b * intensity
-        }
 
-        color.r = clampMax(color.r,1)
-        color.g = clampMax(color.g,1)
-        color.b = clampMax(color.b,1)
+            color.r = clampMax(color.r,1)
+            color.g = clampMax(color.g,1)
+            color.b = clampMax(color.b,1)            
+        }
     }    
+}
+
+export interface ISpotLight {
+    pos:{x:number,y:number,z:number}
+    dir:{x:number,y:number,z:number}
+    color: Color,
+    constantAttenuation: number,
+    linearAttenuation: number,
+    quadraticAttenuation: number
+    //innerAngle:number //TODO: inner/outer angle
+    //outerAngle:number
+    powerFalloff:number
+}
+
+export let addSpotLight = (renderGroup:IRenderGroup, light:ISpotLight) => {
+    for(let i = 0, f = 0; i < renderGroup.numVertices; i+=3,f++) {    
+        let backFacing = renderGroup.isBackFace[f]
+        if(backFacing) continue            
+
+        let color = renderGroup.calculatedFaceColors[f]
+        let baseColor = renderGroup.faceBaseColors[f]
+        let normal = renderGroup.faceNormals[f]
+        let normalLength = renderGroup.normalLengths[f]
+        let p0 = renderGroup.transformedVertices[i]
+
+        let dp = dot(normal,light.dir)
+        
+        if(dp > 0) {
+        
+            let lightToSurface = subtract3d(light.pos,p0)
+            let distanceToLight = length3d(lightToSurface)
+
+            let dpsl = dot(lightToSurface,light.dir) / distanceToLight
+
+            if(dpsl > 0) {
+                let attenuation = light.constantAttenuation + (light.linearAttenuation * distanceToLight) + (light.quadraticAttenuation * distanceToLight * distanceToLight)
+
+                let iPf = int(light.powerFalloff)
+                let dpslExp = dpsl
+                for(let expIndex = 1; expIndex < iPf; expIndex++) {
+                    dpslExp *= dpsl
+                }
+                
+                let intensity = dp * dpslExp / (normalLength * attenuation)
+
+                color.r += light.color.r * baseColor.r * intensity
+                color.g += light.color.g * baseColor.g * intensity
+                color.b += light.color.b * baseColor.b * intensity
+
+                color.r = clampMax(color.r,1)
+                color.g = clampMax(color.g,1)
+                color.b = clampMax(color.b,1)                
+            }
+        }
+    }  
 }

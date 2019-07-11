@@ -8,7 +8,7 @@ import { buildRotationMatrixEuler, applyTransformationMatrix, applyTranslation, 
 import { Colors, makeRGBColor, floatToRGBColor, makeFloatColor } from '../primatives/Color';
 import cube from '../primatives/cube';
 import { number } from 'prop-types';
-import { addSunLight, addAmbientLight, prepareRenderGroupForRendering, createRenderGroup, pushRenderable, IRenderGroup, IPointLight, addPointLight } from '../helpers/rendering';
+import { addSunLight, addAmbientLight, prepareRenderGroupForRendering, createRenderGroup, pushRenderable, IRenderGroup, IPointLight, addPointLight, addSpotLight, ISpotLight } from '../helpers/rendering';
 import React from 'react';
 
 interface SceneOptions {
@@ -89,6 +89,9 @@ class Renderer extends RendererBase {
     pointLight:IPointLight
     pointLightAngle = 0
 
+    spotLight:ISpotLight
+    spotLightAngle = 0
+
     async init() {
 
         this.setSize(800,600)
@@ -119,10 +122,23 @@ class Renderer extends RendererBase {
             linearAttenuation: 0.001,
             quadraticAttenuation: 0
         }        
+
+        this.spotLight = {
+            pos: vec3(0,200,0),
+            dir: vec3(-1,0,-1),
+            color: makeFloatColor(1,0,0),
+            constantAttenuation: 0,
+            linearAttenuation: 0.001,
+            quadraticAttenuation: 0,
+            innerAngle: 0,
+            outerAngle: 0,
+            powerFalloff: 1
+        }
     }
 
     doLighting(renderGroup:IRenderGroup, deltaMS:number) {
         //TODO: just do one loop over each face and add lights to face for all lights
+        
         // move point light source in ellipse around game world
         let pointLightPos = this.pointLight.pos
         let pointLightAngle = this.pointLightAngle
@@ -133,6 +149,17 @@ class Renderer extends RendererBase {
         pointLightAngle += 3 * deltaMS
         if(pointLightAngle > 360) pointLightAngle = 0
         this.pointLightAngle = pointLightAngle        
+
+        let spotLightPos = this.spotLight.pos
+        let spotLightAngle = this.spotLightAngle
+        spotLightPos.x = 200 * Math.cos(spotLightAngle)
+        spotLightPos.y = -200
+        spotLightPos.z = 200 * Math.sin(spotLightAngle)
+
+        spotLightAngle -= 5 * deltaMS
+        if(spotLightAngle < 0) spotLightAngle = 360
+        this.spotLightAngle = spotLightAngle        
+        
         
 
         let ambientLightColor = makeFloatColor(0.1,0.1,0.1)
@@ -144,7 +171,10 @@ class Renderer extends RendererBase {
 
         addSunLight(renderGroup,sunLightDir, sunLightColor)
 
-        addPointLight(renderGroup, this.pointLight)                
+        addPointLight(renderGroup, this.pointLight)              
+            
+
+        addSpotLight(renderGroup, this.spotLight)
     }
 
 

@@ -61,13 +61,13 @@ export default class GURU8_8 extends SoftwareSceneBase {
                 <button onClick={this.toggleBoolean('renderNormals')}>Toggle Normals {state.renderNormals ? "Off": "On"}</button>
             </div>   
             <div>
-                <button onClick={this.toggleBoolean('rotateX')}>Toggle Roatate X {state.rotateX ? "Off": "On"}</button>
+                <button onClick={this.toggleBoolean('rotateX')}>Toggle Rotate X {state.rotateX ? "Off": "On"}</button> {renderer && renderer.sphereRotation.x.toFixed(2)}
             </div>                      
             <div>
-                <button onClick={this.toggleBoolean('rotateY')}>Toggle Roatate Y {state.rotateY ? "Off": "On"}</button>
+                <button onClick={this.toggleBoolean('rotateY')}>Toggle Rotate Y {state.rotateY ? "Off": "On"}</button> {renderer && renderer.sphereRotation.y.toFixed(2)}
             </div>                      
             <div>
-                <button onClick={this.toggleBoolean('rotateZ')}>Toggle Roatate Z {state.rotateZ ? "Off": "On"}</button>
+                <button onClick={this.toggleBoolean('rotateZ')}>Toggle Rotate Z {state.rotateZ ? "Off": "On"}</button> {renderer && renderer.sphereRotation.z.toFixed(2)}
             </div>                                              
         </>
     }      
@@ -85,7 +85,7 @@ class Renderer extends RendererBase {
     camera:IEulerCamera
     sphere:ASCObject
     spherePos:{x:number,y:number,z:number} = vec3(0,0,0)
-    sphereRotation:{x:number,y:number,z:number} = vec3(0,6,0)
+    sphereRotation:{x:number,y:number,z:number} = vec3(0,0,0)
     pointLight:IPointLight
     pointLightAngle = 0
 
@@ -122,6 +122,7 @@ class Renderer extends RendererBase {
     }
 
     doLighting(renderGroup:IRenderGroup, deltaMS:number) {
+        //TODO: just do one loop over each face and add lights to face for all lights
         // move point light source in ellipse around game world
         let pointLightPos = this.pointLight.pos
         let pointLightAngle = this.pointLightAngle
@@ -176,6 +177,7 @@ class Renderer extends RendererBase {
         if(this.renderWireFrame) {
             this.drawWireFrame(renderGroup, this.camera.pos)        
         }
+
 
 
         if(this.rotateX) {

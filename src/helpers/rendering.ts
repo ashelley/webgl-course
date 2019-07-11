@@ -81,8 +81,10 @@ export let prepareRenderGroupForRendering = (renderGroup:IRenderGroup, camPos:{x
 
 export let addAmbientLight = (renderGroup:IRenderGroup, lightColor:{r:number,g:number,b:number}) => {
 
-    for(let i = 0; i < renderGroup.numFaces; i++) {
-        let baseColor = renderGroup.faceBaseColors[i]
+    for(let f = 0; f < renderGroup.numFaces; f++) {
+        let backFacing = renderGroup.isBackFace[f]
+        if(backFacing) continue
+        let baseColor = renderGroup.faceBaseColors[f]
 
         let r = baseColor.r * lightColor.r
         let g = baseColor.g * lightColor.g
@@ -95,13 +97,15 @@ export let addAmbientLight = (renderGroup:IRenderGroup, lightColor:{r:number,g:n
         g = clampMax(g,1)
         b = clampMax(b,1)        
 
-        renderGroup.calculatedFaceColors[i] = {r,g,b,a}
+        renderGroup.calculatedFaceColors[f] = {r,g,b,a}
     }
 
 }
 
 export let addSunLight = (renderGroup:IRenderGroup, lightDir:{x:number,y:number,z:number}, lightColor:{r:number,g:number,b:number}) => {
-    for(let i = 0, f = 0; i < renderGroup.numVertices; i+=3,f++) {        
+    for(let i = 0, f = 0; i < renderGroup.numVertices; i+=3,f++) {    
+        let backFacing = renderGroup.isBackFace[f]
+        if(backFacing) continue            
         let color = renderGroup.calculatedFaceColors[f]
         let normal = renderGroup.faceNormals[f]
 
@@ -132,7 +136,9 @@ export interface IPointLight {
 }
 
 export let addPointLight = (renderGroup:IRenderGroup, light:IPointLight) => {
-    for(let i = 0, f = 0; i < renderGroup.numVertices; i+=3,f++) {        
+    for(let i = 0, f = 0; i < renderGroup.numVertices; i+=3,f++) {    
+        let backFacing = renderGroup.isBackFace[f]
+        if(backFacing) continue            
         let color = renderGroup.calculatedFaceColors[f]
         let baseColor = renderGroup.faceBaseColors[f]
         let normal = renderGroup.faceNormals[f]

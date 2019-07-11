@@ -5,6 +5,8 @@ export let abs = Math.abs
 export let int = Math.floor
 export let sqrt = Math.sqrt
 
+export let TAU = Math.PI*2
+
 export let subtract2d = (p0:{x:number,y:number}, p1:{x:number, y:number}) => {
     return {x: p0.x - p1.x, y: p0.y - p1.y} 
 }

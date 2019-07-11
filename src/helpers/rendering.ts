@@ -1,4 +1,5 @@
-import { calcNormal, isBackFace, clampMax, dot } from './math';
+import { calcNormal, isBackFace, clampMax, dot, length3d, normalize, subtract3d } from './math';
+import { Color } from '../primatives/Color';
 
 export interface IRenderable {
     vertices: {x:number,y:number,z:number,w:number}[]    
@@ -15,6 +16,7 @@ export interface IRenderGroup {
     worldSpaceVertices:{x:number,y:number,z:number,w:number}[]        
     transformedVertices:{x:number,y:number,z:number,w:number}[]    
     faceNormals:{x:number,y:number,z:number}[]    
+    normalLengths:number[]    
     vertexNormals:{x:number,y:number,z:number}[]    
     faceBaseColors:{r:number,g:number,b:number,a:number}[]
     calculatedFaceColors:{r:number,g:number,b:number,a:number}[]
@@ -28,6 +30,7 @@ export let createRenderGroup = ():IRenderGroup => {
         worldSpaceVertices:[],        
         transformedVertices:[],    
         faceNormals:[],    
+        normalLengths: [],
         vertexNormals:[],    
         faceBaseColors:[],
         calculatedFaceColors:[],
@@ -63,12 +66,15 @@ export let prepareRenderGroupForRendering = (renderGroup:IRenderGroup, camPos:{x
         let p1 = renderGroup.worldSpaceVertices[i+1]
         let p2 = renderGroup.worldSpaceVertices[i+2]
         
-        let n = calcNormal(p0,p1,p2,true) //TODO: normalize?        
+        let n = calcNormal(p0,p1,p2,false) //TODO: normalize?        
+        let nl = length3d(n)
+        normalize(n)
         //let c = centroid(p0,p1,p2)
 
         let backFacing = isBackFace(n,p0,camPos)
 
         renderGroup.faceNormals[f] = n
+        renderGroup.normalLengths[f] = nl
         renderGroup.isBackFace[f] = backFacing
     }    
 }
@@ -112,7 +118,44 @@ export let addSunLight = (renderGroup:IRenderGroup, lightDir:{x:number,y:number,
         }
 
         color.r = clampMax(color.r,1)
-        color.g = clampMax(color.r,1)
+        color.g = clampMax(color.g,1)
         color.b = clampMax(color.b,1)
     }
+}
+
+export interface IPointLight {
+    pos:{x:number,y:number,z:number}
+    color: Color,
+    constantAttenuation: number,
+    linearAttenuation: number,
+    quadraticAttenuation: number
+}
+
+export let addPointLight = (renderGroup:IRenderGroup, light:IPointLight) => {
+    for(let i = 0, f = 0; i < renderGroup.numVertices; i+=3,f++) {        
+        let color = renderGroup.calculatedFaceColors[f]
+        let baseColor = renderGroup.faceBaseColors[f]
+        let normal = renderGroup.faceNormals[f]
+        let normalLength = renderGroup.normalLengths[f]
+        let p0 = renderGroup.transformedVertices[i]
+        
+        let vLight = subtract3d(p0,light.pos)
+
+        let distanceToLight = length3d(vLight)
+
+
+        let dp = dot(normal,vLight)
+
+        if(dp > 0) {
+            let attenuation = light.constantAttenuation + (light.linearAttenuation * distanceToLight) + (light.quadraticAttenuation * distanceToLight * distanceToLight)
+            let intensity = dp / (normalLength * distanceToLight * attenuation)
+            color.r += light.color.r * baseColor.r * intensity
+            color.g += light.color.g * baseColor.g * intensity
+            color.b += light.color.b * baseColor.b * intensity
+        }
+
+        color.r = clampMax(color.r,1)
+        color.g = clampMax(color.g,1)
+        color.b = clampMax(color.b,1)
+    }    
 }

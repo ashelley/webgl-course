@@ -8,7 +8,7 @@ import { buildRotationMatrixEuler, applyTransformationMatrix, applyTranslation, 
 import { Colors, makeRGBColor, floatToRGBColor, makeFloatColor } from '../primatives/Color';
 import cube from '../primatives/cube';
 import { number } from 'prop-types';
-import { addSunLight, addAmbientLight, prepareRenderGroupForRendering, createRenderGroup, pushRenderable, IRenderGroup } from '../helpers/rendering';
+import { addSunLight, addAmbientLight, prepareRenderGroupForRendering, createRenderGroup, pushRenderable, IRenderGroup, IPointLight, addPointLight } from '../helpers/rendering';
 import React from 'react';
 
 interface SceneOptions {
@@ -86,6 +86,8 @@ class Renderer extends RendererBase {
     sphere:ASCObject
     spherePos:{x:number,y:number,z:number} = vec3(0,0,0)
     sphereRotation:{x:number,y:number,z:number} = vec3(0,6,0)
+    pointLight:IPointLight
+    pointLightAngle = 0
 
     async init() {
 
@@ -109,6 +111,14 @@ class Renderer extends RendererBase {
             farClipZ: 12000,
             fov: 120,
         })            
+
+        this.pointLight = {
+            pos: vec3(0,200,0),
+            color: makeFloatColor(0,1,0),
+            constantAttenuation: 0,
+            linearAttenuation: 0.001,
+            quadraticAttenuation: 0
+        }        
     }
 
 
@@ -143,6 +153,8 @@ class Renderer extends RendererBase {
 
         addSunLight(renderGroup,sunLightDir, sunLightColor)
 
+        addPointLight(renderGroup, this.pointLight)
+
 
         this.drawShaded(renderGroup, this.camera.pos)
         
@@ -163,7 +175,16 @@ class Renderer extends RendererBase {
             this.sphereRotation.z -= 0.5 * deltaMS
         }
 
-        //this.sphereRotation.x += 0.01
+        // move point light source in ellipse around game world
+        let pointLightPos = this.pointLight.pos
+        let pointLightAngle = this.pointLightAngle
+        pointLightPos.x = 300 * Math.cos(pointLightAngle)
+        pointLightPos.y = 200
+        pointLightPos.z = 300 * Math.sin(pointLightAngle)
+
+        pointLightAngle += 3 * deltaMS
+        if(pointLightAngle > 360) pointLightAngle = 0
+        this.pointLightAngle = pointLightAngle
     }
 
     drawShaded(renderGroup:IRenderGroup, cameraPos:{x:number,y:number,z:number}) {

@@ -28,9 +28,9 @@ export default class GURU8_8 extends SoftwareSceneBase {
         return {
             renderWireFrame: false,
             renderNormals: false,
-            rotateX: false,
-            rotateY: false,
-            rotateZ: false
+            rotateX: true,
+            rotateY: true,
+            rotateZ: true
         }
     }
 
@@ -130,8 +130,8 @@ class Renderer extends RendererBase {
             constantAttenuation: 0,
             linearAttenuation: 0.001,
             quadraticAttenuation: 0,
-            innerAngle: 0,
-            outerAngle: 0,
+            //innerAngle: 0,
+            //outerAngle: 0,
             powerFalloff: 1
         }
     }

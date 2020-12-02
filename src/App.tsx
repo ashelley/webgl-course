@@ -1,18 +1,13 @@
 import React from "react"
-import WebGLCanvas from "./WebGLCanvas";
-import HtmlCanvas from "./HtmlCanvas";
+import SceneSelector from "./SceneSelector"
 
 export default class App extends React.Component {
 
     render() {
-        return <div style={{ display:'flex', 
-                             flexGrow:1, 
-                             backgroundColor:'#404040'}}>
-                    <div style={{flexGrow:1, display:'flex', alignItems:'center', justifyContent:'center'}}>
-                        {/* <WebGLCanvas />          */}
-                        <HtmlCanvas />
-                    </div>
-                </div>
+        return (
+            <div style={{ display:'flex', position:'absolute', top:0,left:0,right:0,bottom:0, backgroundColor:'#404040', alignItems:'center', justifyContent:'center'}}>
+                <SceneSelector />
+            </div>
     }
 
 }

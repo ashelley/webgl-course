@@ -15,11 +15,10 @@ import PerspectiveRasterizationScratchZBuffer from "./software_scenes/Perspectiv
 import GURU8_8 from "./software_scenes/GURU8_8";
 import GURU7_1 from './software_scenes/GURU7_1';
 
-export default class HtmlCanvas extends React.Component<{},{}> {
-
-
+export default class SceneSelector extends React.Component<{},{}> {
     render() {
         return (
+            //* <WebGLCanvas /> */}
             // <TestSoftwareLineDrawing />
             // <TestWireFrame />
             //<TriangleRasterization />
